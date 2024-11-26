@@ -1,24 +1,24 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 
-export type AppUserDocument = AppUser & Document;
+export type UserDocument = User & Document;
 
 @Schema()
-export class AppUser {
+export class User {
   @Prop({ required: true })
   fullname: string;
 
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ default: 'participant', enum: ['participant', 'organizer', 'admin'] })
+  @Prop({ default: 'participant', enum: ['participant', 'organizer'] })
   role: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }] })
-  eventsOrganized: string[]; // IDs of events created by the user (for organizers)
+  eventsOrganized: string[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }] })
-  registeredEvents: string[]; // IDs of events the user registered for
+  registeredEvents: string[];
 }
 
-export const AppUserSchema = SchemaFactory.createForClass(AppUser);
+export const UserSchema = SchemaFactory.createForClass(User);
