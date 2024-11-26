@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "../../components/auth/FormInput";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { authService } from "../../services/auth.service";
 import { toast } from "react-toastify";
@@ -151,13 +151,13 @@ const Register = () => {
                   htmlFor="username"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  User name
+                  Username
                 </label>
                 <FormInput
                   type="text"
                   {...register("username")}
                   id="username"
-                  placeholder="Enter your user name"
+                  placeholder="Enter your username"
                   onBlur={handleUsernameBlur}
                 />
                 {errors.username && (
@@ -258,12 +258,12 @@ const Register = () => {
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
-                <a
-                  href="#"
+                <Link
+                  to="/login"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Login here
-                </a>
+                </Link>
               </p>
             </form>
           </div>
