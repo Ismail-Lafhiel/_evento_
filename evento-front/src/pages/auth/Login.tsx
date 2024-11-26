@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { authService } from "../../services/auth.service";
 
 const loginSchema = z.object({
   username: z.string().min(3, "Username is required"),
@@ -27,7 +28,7 @@ const Login = () => {
     try {
       setIsLoading(true);
 
-      console.log(data);
+      await authService.login(data.username, data.password);
 
       toast.success("Login successful", {
         position: "top-right",
@@ -37,10 +38,10 @@ const Login = () => {
         pauseOnHover: true,
         draggable: true,
       });
+
       navigate("/");
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Registration failed";
+      const errorMessage = err instanceof Error ? err.message : "Login failed";
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
