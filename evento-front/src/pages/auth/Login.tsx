@@ -1,16 +1,39 @@
 import { Link } from "react-router-dom";
 import FormInput from "../../components/auth/FormInput";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const loginSchema = z.object({
+  username: z.string().min(3, "Username is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+  const onSubmit = async (data: LoginFormData) => {
+    console.log(data);
+  };
   return (
     <section className="bg-gray-100 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Create an account
+              Login to your account
             </h1>
-            <form className="space-y-4 md:space-y-6">
+            <form
+              className="space-y-4 md:space-y-6"
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <div>
                 <label
                   htmlFor="username"
@@ -21,8 +44,14 @@ const Login = () => {
                 <FormInput
                   type="text"
                   id="username"
+                  {...register("username")}
                   placeholder="Enter your user name"
                 />
+                {errors.username && (
+                  <p className="mt-1 ml-1 text-sm text-red-600">
+                    {errors.username.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -34,8 +63,14 @@ const Login = () => {
                 <FormInput
                   type="password"
                   id="password"
+                  {...register("password")}
                   placeholder="Enter your password"
                 />
+                {errors.password && (
+                  <p className="mt-1 ml-1 text-sm text-red-600">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"

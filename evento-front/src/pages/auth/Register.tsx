@@ -11,12 +11,14 @@ const registerSchema = z
   .object({
     fullname: z
       .string()
+      .min(3, "Full name is required")
       .regex(
         /^[A-Za-z]+\s[A-Za-z]+$/,
         "Full name must be in format: First name Space Last name"
       ),
     username: z
       .string()
+      .min(3, "Username is required")
       .transform((username) => {
         // Generate random number between 1 and 999
         const randomNum = Math.floor(Math.random() * 999) + 1;
@@ -141,7 +143,7 @@ const Register = () => {
                   placeholder="Enter your full name"
                 />
                 {errors.fullname && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.fullname.message}
                   </p>
                 )}
@@ -161,7 +163,7 @@ const Register = () => {
                   onBlur={handleUsernameBlur}
                 />
                 {errors.username && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.username.message}
                   </p>
                 )}
@@ -180,7 +182,7 @@ const Register = () => {
                   placeholder="Enter your email"
                 />
                 {errors.email && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.email.message}
                   </p>
                 )}
@@ -199,7 +201,7 @@ const Register = () => {
                   placeholder="Enter your password"
                 />
                 {errors.password && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.password.message}
                   </p>
                 )}
@@ -218,7 +220,7 @@ const Register = () => {
                   placeholder="Confirm your password"
                 />
                 {errors.confirm_password && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.confirm_password.message}
                   </p>
                 )}
