@@ -36,6 +36,7 @@ export const authService = {
       throw new Error("Network error occurred");
     }
   },
+
   login: async (username: string, password: string) => {
     try {
       const response = await axios.post(`${AUTH_SERVICE_URL}/auth/login`, {
@@ -43,7 +44,6 @@ export const authService = {
         password,
       });
 
-      // The token is inside response.data.data.access_token
       const token = response.data.data.access_token;
 
       // Store the token
@@ -64,6 +64,7 @@ export const authService = {
       throw new Error("Network error occurred");
     }
   },
+
   logout: () => {
     Cookies.remove(TOKEN_COOKIE_NAME);
   },
@@ -74,5 +75,23 @@ export const authService = {
 
   isAuthenticated: () => {
     return !!Cookies.get(TOKEN_COOKIE_NAME);
+  },
+
+  getUserRole: (): string | null => {
+    try {
+      const token = Cookies.get(TOKEN_COOKIE_NAME);
+      if (!token) return null;
+
+      // Decode JWT token
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.role;
+    } catch {
+      return null;
+    }
+  },
+
+  hasRole: (role: string): boolean => {
+    const userRole = authService.getUserRole();
+    return userRole === role;
   },
 };
