@@ -5,14 +5,39 @@ import FormInput from "../../components/auth/FormInput";
 
 const registerSchema = z
   .object({
-    fullname: z.string().min(3, "Full name must be at least 3 characters"),
-    username: z.string().min(3, "Username must be at least 3 characters"),
+    fullname: z
+      .string()
+      .regex(
+        /^[A-Za-z]+\s[A-Za-z]+$/,
+        "Full name must be in format: First name Space Last name"
+      ),
+    username: z
+      .string()
+      .transform((username) => {
+        // Generate random number between 1 and 999
+        const randomNum = Math.floor(Math.random() * 999) + 1;
+        // Add @ prefix and random number suffix if they don't exist
+        if (!username.startsWith("@")) {
+          username = "@" + username;
+        }
+        // Remove any existing numbers at the end before adding new ones
+        username = username.replace(/\d+$/, "");
+        return `${username}${randomNum}`;
+      })
+      .pipe(
+        z
+          .string()
+          .regex(
+            /^@[A-Za-z]+[0-9]{1,3}$/,
+            "Username must contain only letters with optional numbers at the end"
+          )
+      ),
     email: z.string().email("Invalid email address"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/,
         "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
       ),
     confirm_password: z.string(),
@@ -28,6 +53,7 @@ const Register = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -36,6 +62,23 @@ const Register = () => {
   const onSubmit = (data: RegisterFormData) => {
     console.log(data);
   };
+
+  const handleUsernameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    if (value) {
+      // Remove any existing @ prefix and numbers at the end
+      value = value.replace(/^@/, "").replace(/\d+$/, "");
+      // Add @ prefix if it doesn't exist
+      if (!value.startsWith("@")) {
+        value = "@" + value;
+      }
+      // Generate random number between 1 and 999
+      const randomNum = Math.floor(Math.random() * 999) + 1;
+      value = `${value}${randomNum}`;
+      setValue("username", value);
+    }
+  };
+
   return (
     <section className="bg-gray-100 dark:bg-gray-900 xl:py-24">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -79,6 +122,7 @@ const Register = () => {
                   {...register("username")}
                   id="username"
                   placeholder="Enter your user name"
+                  onBlur={handleUsernameBlur}
                 />
                 {errors.username && (
                   <p className="mt-1 ml-1 text-xs text-red-600">
