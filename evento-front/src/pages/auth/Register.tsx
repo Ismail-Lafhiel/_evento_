@@ -1,15 +1,53 @@
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "../../components/auth/FormInput";
 
+const registerSchema = z
+  .object({
+    fullname: z.string().min(3, "Full name must be at least 3 characters"),
+    username: z.string().min(3, "Username must be at least 3 characters"),
+    email: z.string().email("Invalid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
+      ),
+    confirm_password: z.string(),
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: "Passwords don't match",
+    path: ["confirm_password"],
+  });
+
+type RegisterFormData = z.infer<typeof registerSchema>;
+
 const Register = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = (data: RegisterFormData) => {
+    console.log(data);
+  };
   return (
-    <section className="bg-gray-100 dark:bg-gray-900 xl:py-16">
+    <section className="bg-gray-100 dark:bg-gray-900 xl:py-24">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Create an account
             </h1>
-            <form className="space-y-4 md:space-y-6" action="#">
+            <form
+              className="space-y-4 md:space-y-6"
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <div>
                 <label
                   htmlFor="fullname"
@@ -19,10 +57,15 @@ const Register = () => {
                 </label>
                 <FormInput
                   type="text"
-                  name="fullname"
+                  {...register("fullname")}
                   id="fullname"
                   placeholder="Enter your full name"
                 />
+                {errors.fullname && (
+                  <p className="mt-1 ml-1 text-xs text-red-600">
+                    {errors.fullname.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -33,10 +76,15 @@ const Register = () => {
                 </label>
                 <FormInput
                   type="text"
-                  name="username"
+                  {...register("username")}
                   id="username"
                   placeholder="Enter your user name"
                 />
+                {errors.username && (
+                  <p className="mt-1 ml-1 text-xs text-red-600">
+                    {errors.username.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -47,10 +95,15 @@ const Register = () => {
                 </label>
                 <FormInput
                   type="email"
-                  name="email"
+                  {...register("email")}
                   id="email"
                   placeholder="Enter your email"
                 />
+                {errors.email && (
+                  <p className="mt-1 ml-1 text-xs text-red-600">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -61,10 +114,15 @@ const Register = () => {
                 </label>
                 <FormInput
                   type="password"
-                  name="password"
+                  {...register("password")}
                   id="password"
                   placeholder="Enter your password"
                 />
+                {errors.password && (
+                  <p className="mt-1 ml-1 text-xs text-red-600">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -75,10 +133,15 @@ const Register = () => {
                 </label>
                 <FormInput
                   type="password"
-                  name="confirm_password"
+                  {...register("confirm_password")}
                   id="confirm_password"
                   placeholder="Confirm your password"
                 />
+                {errors.confirm_password && (
+                  <p className="mt-1 ml-1 text-xs text-red-600">
+                    {errors.confirm_password.message}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
