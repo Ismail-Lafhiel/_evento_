@@ -2,17 +2,23 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "../../components/auth/FormInput";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { authService } from "../../services/auth.service";
+import { toast } from "react-toastify";
 
 const registerSchema = z
   .object({
     fullname: z
       .string()
+      .min(3, "Full name is required")
       .regex(
         /^[A-Za-z]+\s[A-Za-z]+$/,
         "Full name must be in format: First name Space Last name"
       ),
     username: z
       .string()
+      .min(3, "Username is required")
       .transform((username) => {
         // Generate random number between 1 and 999
         const randomNum = Math.floor(Math.random() * 999) + 1;
@@ -50,6 +56,8 @@ const registerSchema = z
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const Register = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -59,8 +67,38 @@ const Register = () => {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log(data);
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      setIsLoading(true);
+
+      // Remove confirm_password before sending to API
+      const { confirm_password, ...registerData } = data;
+
+      await authService.register(registerData);
+
+      toast.success("Registration successful! Please log in.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      navigate("/login");
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Registration failed";
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleUsernameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -105,7 +143,7 @@ const Register = () => {
                   placeholder="Enter your full name"
                 />
                 {errors.fullname && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.fullname.message}
                   </p>
                 )}
@@ -115,17 +153,17 @@ const Register = () => {
                   htmlFor="username"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  User name
+                  Username
                 </label>
                 <FormInput
                   type="text"
                   {...register("username")}
                   id="username"
-                  placeholder="Enter your user name"
+                  placeholder="Enter your username"
                   onBlur={handleUsernameBlur}
                 />
                 {errors.username && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.username.message}
                   </p>
                 )}
@@ -144,7 +182,7 @@ const Register = () => {
                   placeholder="Enter your email"
                 />
                 {errors.email && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.email.message}
                   </p>
                 )}
@@ -163,7 +201,7 @@ const Register = () => {
                   placeholder="Enter your password"
                 />
                 {errors.password && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.password.message}
                   </p>
                 )}
@@ -182,25 +220,52 @@ const Register = () => {
                   placeholder="Confirm your password"
                 />
                 {errors.confirm_password && (
-                  <p className="mt-1 ml-1 text-xs text-red-600">
+                  <p className="mt-1 ml-1 text-sm text-red-600">
                     {errors.confirm_password.message}
                   </p>
                 )}
               </div>
               <button
                 type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                disabled={isLoading}
+                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create an account
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Registering...
+                  </span>
+                ) : (
+                  "Create an account"
+                )}
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
-                <a
-                  href="#"
+                <Link
+                  to="/login"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Login here
-                </a>
+                </Link>
               </p>
             </form>
           </div>

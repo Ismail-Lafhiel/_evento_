@@ -4,6 +4,7 @@ import About from "../pages/About";
 import NotFound from "../pages/NotFound";
 import Layout from "../components/Layout";
 import Register from "../pages/auth/Register";
+import Login from "../pages/auth/Login";
 
 export const routes: RouteObject[] = [
   {
@@ -26,6 +27,10 @@ export const routes: RouteObject[] = [
       {
         path: "Register",
         element: <Register />,
+      },
+      {
+        path: "login",
+        element: <Login />,
       },
     ],
   },
