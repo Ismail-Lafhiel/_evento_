@@ -1,4 +1,6 @@
 const ParticipantDashboard = () => {
-  return <div>ParticipantDashboard</div>;
+  return (
+    <div>Participant Dashboard</div>
+  );
 };
 export default ParticipantDashboard;

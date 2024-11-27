@@ -39,7 +39,16 @@ const Login = () => {
         draggable: true,
       });
 
-      navigate("/");
+      const routes = {
+        participant: "/participant/dashboard",
+        organizer: "/organizer/dashboard",
+      };
+      const role = authService.getUserRole();
+      if (role === "organizer") {
+        navigate(routes.organizer);
+      } else if (role === "participant") {
+        navigate(routes.participant);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Login failed";
       toast.error(errorMessage, {
