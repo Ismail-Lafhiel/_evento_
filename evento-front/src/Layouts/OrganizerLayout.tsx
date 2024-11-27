@@ -56,7 +56,7 @@ const OrganizerLayout = () => {
                 to="/organizer/dashboard"
                 className={`flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors ${
                   isActiveLink("/dashboard")
-                    ? "bg-blue-50 text-blue-600"
+                    ? "bg-primary-50 text-primary-600"
                     : "hover:bg-gray-50"
                 }`}
               >
@@ -69,7 +69,7 @@ const OrganizerLayout = () => {
                 to="/organizer/events"
                 className={`flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors ${
                   isActiveLink("/events")
-                    ? "bg-blue-50 text-blue-600"
+                    ? "bg-primary-50 text-primary-600"
                     : "hover:bg-gray-50"
                 }`}
               >
@@ -82,7 +82,7 @@ const OrganizerLayout = () => {
                 to="/organizer/categories"
                 className={`flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors ${
                   isActiveLink("/categories")
-                    ? "bg-blue-50 text-blue-600"
+                    ? "bg-primary-50 text-primary-600"
                     : "hover:bg-gray-50"
                 }`}
               >
@@ -95,7 +95,7 @@ const OrganizerLayout = () => {
                 to="/organizer/tickets"
                 className={`flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors ${
                   isActiveLink("/tickets")
-                    ? "bg-blue-50 text-blue-600"
+                    ? "bg-primary-50 text-primary-600"
                     : "hover:bg-gray-50"
                 }`}
               >
@@ -109,7 +109,7 @@ const OrganizerLayout = () => {
         {/* User Profile Section */}
         <div className="border-t border-gray-200 p-4">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
+            <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white">
               {user?.fullname?.charAt(0)}
             </div>
             {isSidebarOpen && (
