@@ -1,6 +1,6 @@
 // src/layouts/ParticipantLayout.tsx (renamed from ParticipantDashboard.tsx)
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { authService } from '../../services/auth.service';
+import { authService } from '../services/auth.service';
 
 
 const ParticipantLayout = () => {

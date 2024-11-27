@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { authService } from "../services/auth.service";
 
-const Layout = () => {
+const GuestLayout = () => {
   const navigate = useNavigate();
   const isAuthenticated = authService.isAuthenticated();
   const userRole = authService.getUserRole();
@@ -173,4 +173,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default GuestLayout;

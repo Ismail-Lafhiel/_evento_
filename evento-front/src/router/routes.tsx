@@ -5,42 +5,44 @@ import { GuestGuard } from "../components/guards/GuestGuard";
 import Register from "../pages/auth/Register";
 import Login from "../pages/auth/Login";
 import { RoleGuard } from "../components/guards/RoleGuard";
-import Layout from "../components/Layout";
 import NotFound from "../pages/NotFound";
-import ParticipantLayout from "../components/participant/ParticipantLayout";
-import OriganizerLayout from "../components/organizer/OriganizerLayout";
+import ParticipantLayout from "../Layouts/ParticipantLayout";
+import OriganizerLayout from "../Layouts/OrganizerLayout";
+import GuestLayout from "../Layouts/GuestLayout";
 import Dashboard from "../pages/organizer/OrganizerDashboard";
 import ParticipantDashboard from "../pages/participant/ParticipantDashboard";
 
-// Public routes (accessible to everyone)
 const publicRoutes: RouteObject[] = [
   {
-    index: true,
-    element: <Home />,
-  },
-  {
-    path: "about",
-    element: <About />,
-  },
-];
-
-// Guest routes (only for non-authenticated users)
-const guestRoutes: RouteObject[] = [
-  {
-    path: "register",
-    element: (
-      <GuestGuard>
-        <Register />
-      </GuestGuard>
-    ),
-  },
-  {
-    path: "login",
-    element: (
-      <GuestGuard>
-        <Login />
-      </GuestGuard>
-    ),
+    path: "/",
+    element: <GuestLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "about",
+        element: <About />,
+      },
+      // Guest routes (only for non-authenticated users)
+      {
+        path: "register",
+        element: (
+          <GuestGuard>
+            <Register />
+          </GuestGuard>
+        ),
+      },
+      {
+        path: "login",
+        element: (
+          <GuestGuard>
+            <Login />
+          </GuestGuard>
+        ),
+      },
+    ],
   },
 ];
 
@@ -80,15 +82,15 @@ const participantRoutes: RouteObject[] = [
   },
 ];
 
+// Main routes configuration
 export const routes: RouteObject[] = [
+  ...publicRoutes,
+  ...organizerRoutes,
+  ...participantRoutes,
   {
-    path: "/",
-    element: <Layout />,
+    path: "*",
+    element: <GuestLayout />,
     children: [
-      ...publicRoutes,
-      ...guestRoutes,
-      ...organizerRoutes,
-      ...participantRoutes,
       {
         path: "*",
         element: <NotFound />,
