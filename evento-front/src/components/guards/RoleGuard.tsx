@@ -8,9 +8,13 @@ export const RoleGuard = ({
   children: React.ReactNode;
   allowedRoles: string[];
 }) => {
-  const userRole = authService.getUserRole();
+  if (!authService.isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
 
-  if (!authService.isAuthenticated() || !userRole || !allowedRoles.includes(userRole)) {
+  const userRole = authService.getUserRole();
+  
+  if (!userRole || !allowedRoles.includes(userRole)) {
     return <Navigate to="/" replace />;
   }
 

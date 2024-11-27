@@ -1,72 +1,58 @@
-import axios from "axios";
-import Cookies from "js-cookie";
+import Cookies from 'js-cookie';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
-const TOKEN_COOKIE_NAME = "access_token";
+const TOKEN_COOKIE_NAME = 'access_token';
+const EVENTO_URL = 'http://localhost:3001'; // adjust as needed
 
-export interface RegisterData {
-  fullname: string;
+interface User {
+  id: string;
   username: string;
   email: string;
-  password: string;
+  role: string;
+  fullname: string;
 }
 
-export interface LoginResponse {
-  access_token: string;
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    fullname: string;
+interface AuthResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    access_token: string;
+    user: User;
   };
 }
 
 export const authService = {
-  register: async (userData: RegisterData) => {
-    try {
-      const response = await axios.post(
-        `${AUTH_SERVICE_URL}/auth/register`,
-        userData
-      );
-      return response.data;
-    } catch (error: any) {
-      if (error.response) {
-        throw new Error(error.response.data.message || "Registration failed");
-      }
-      throw new Error("Network error occurred");
-    }
-  },
-
   login: async (username: string, password: string) => {
     try {
-      const response = await axios.post(`${AUTH_SERVICE_URL}/auth/login`, {
+      const response = await axios.post<AuthResponse>(`${EVENTO_URL}/users/login`, {
         username,
         password,
       });
 
-      const token = response.data.data.access_token;
+      const { access_token, user } = response.data.data;
 
       // Store the token
-      Cookies.set(TOKEN_COOKIE_NAME, token, {
-        expires: 1, //day
+      Cookies.set(TOKEN_COOKIE_NAME, access_token, {
+        expires: 1,
         secure: true,
         sameSite: "strict",
         path: "/",
       });
-      console.log("token:", Cookies.get(TOKEN_COOKIE_NAME));
 
-      return response.data.data;
+      // Store user data
+      localStorage.setItem('user', JSON.stringify(user));
+
+      return { access_token, user };
     } catch (error: any) {
       console.error("Login error:", error);
-      if (error.response) {
-        throw new Error(error.response.data.message || "Login failed");
-      }
-      throw new Error("Network error occurred");
+      throw new Error(error.response?.data?.message || "Login failed");
     }
   },
 
   logout: () => {
     Cookies.remove(TOKEN_COOKIE_NAME);
+    localStorage.removeItem('user');
   },
 
   getToken: () => {
@@ -74,24 +60,51 @@ export const authService = {
   },
 
   isAuthenticated: () => {
-    return !!Cookies.get(TOKEN_COOKIE_NAME);
+    const token = Cookies.get(TOKEN_COOKIE_NAME);
+    if (!token) return false;
+
+    try {
+      const decodedToken: any = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decodedToken.exp > currentTime;
+    } catch {
+      return false;
+    }
   },
 
-  getUserRole: (): string | null => {
+  getCurrentUser: (): User | null => {
     try {
-      const token = Cookies.get(TOKEN_COOKIE_NAME);
-      if (!token) return null;
-
-      // Decode JWT token
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.role;
+      const userStr = localStorage.getItem('user');
+      if (!userStr) return null;
+      return JSON.parse(userStr);
     } catch {
       return null;
     }
   },
 
-  hasRole: (role: string): boolean => {
-    const userRole = authService.getUserRole();
-    return userRole === role;
+  getUserRole: (): string | null => {
+    const user = authService.getCurrentUser();
+    return user?.role || null;
   },
+
+  // Add this method to handle axios interceptors
+  setupAxiosInterceptors: () => {
+    axios.interceptors.request.use((config) => {
+      const token = Cookies.get(TOKEN_COOKIE_NAME);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+
+    axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          authService.logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
 };

@@ -2,7 +2,7 @@ import axios from "axios";
 import { authService } from "./auth.service";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_AUTH_SERVICE_URL,
+  baseURL: import.meta.env.VITE_EVENTO_URL,
 });
 
 api.interceptors.request.use((config) => {
