@@ -3,9 +3,9 @@ import { Document } from 'mongoose';
 
 export type LocationDocument = Location & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Location {
-    
+
   @Prop({ trim: true })
   address: string;
 

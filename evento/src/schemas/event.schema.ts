@@ -4,7 +4,7 @@ import { Location } from './location.schema';
 import { User } from './user.schema';
 export type eventDocument = Event & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Event {
   @Prop({ required: true, trim: true })
   name: string;
@@ -18,10 +18,17 @@ export class Event {
   @Prop({ required: true })
   date: Date;
 
-  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Location' })
+  @Prop({
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Location',
+  })
   location: Location;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
+  @Prop({
+    required: true,
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  })
   participants: User[];
 }
 

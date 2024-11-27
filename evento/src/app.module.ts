@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { UsersModule } from './users/users.module';
 import { LocationModule } from './location/location.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { LocationModule } from './location/location.module';
     }),
     UsersModule,
     LocationModule,
+    EventsModule,
   ],
   controllers: [],
 })
