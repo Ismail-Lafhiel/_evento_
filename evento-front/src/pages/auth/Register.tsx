@@ -19,24 +19,9 @@ const registerSchema = z
     username: z
       .string()
       .min(3, "Username is required")
-      .transform((username) => {
-        // Generate random number between 1 and 999
-        const randomNum = Math.floor(Math.random() * 999) + 1;
-        // Add @ prefix and random number suffix if they don't exist
-        if (!username.startsWith("@")) {
-          username = "@" + username;
-        }
-        // Remove any existing numbers at the end before adding new ones
-        username = username.replace(/\d+$/, "");
-        return `${username}${randomNum}`;
-      })
-      .pipe(
-        z
-          .string()
-          .regex(
-            /^@[A-Za-z]+[0-9]{1,3}$/,
-            "Username must contain only letters with optional numbers at the end"
-          )
+      .regex(
+        /^[A-Za-z][A-Za-z0-9]*$/,
+        "Username must contain only letters and numbers"
       ),
     email: z.string().email("Invalid email address"),
     password: z
@@ -61,7 +46,6 @@ const Register = () => {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -98,22 +82,6 @@ const Register = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleUsernameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-    if (value) {
-      // Remove any existing @ prefix and numbers at the end
-      value = value.replace(/^@/, "").replace(/\d+$/, "");
-      // Add @ prefix if it doesn't exist
-      if (!value.startsWith("@")) {
-        value = "@" + value;
-      }
-      // Generate random number between 1 and 999
-      const randomNum = Math.floor(Math.random() * 999) + 1;
-      value = `${value}${randomNum}`;
-      setValue("username", value);
     }
   };
 
@@ -160,7 +128,6 @@ const Register = () => {
                   {...register("username")}
                   id="username"
                   placeholder="Enter your username"
-                  onBlur={handleUsernameBlur}
                 />
                 {errors.username && (
                   <p className="mt-1 ml-1 text-sm text-red-600">
