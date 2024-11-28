@@ -1,9 +1,8 @@
 import Cookies from "js-cookie";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import api from "./api.service";
 
 const TOKEN_COOKIE_NAME = "access_token";
-const EVENTO_URL = import.meta.env.VITE_EVENTO_URL;
 
 interface User {
   id: string;
@@ -32,10 +31,7 @@ interface AuthResponse {
 export const authService = {
   register: async (userData: RegisterData) => {
     try {
-      const response = await axios.post(
-        `${EVENTO_URL}/users/register`,
-        userData
-      );
+      const response = await api.post("/users/register", userData);
       return response.data;
     } catch (error: any) {
       console.error("Registration error:", error);
@@ -45,13 +41,10 @@ export const authService = {
 
   login: async (username: string, password: string) => {
     try {
-      const response = await axios.post<AuthResponse>(
-        `${EVENTO_URL}/users/login`,
-        {
-          username,
-          password,
-        }
-      );
+      const response = await api.post<AuthResponse>("/users/login", {
+        username,
+        password,
+      });
 
       const { access_token, user } = response.data.data;
 
@@ -110,17 +103,9 @@ export const authService = {
     return user?.role || null;
   },
 
-  // Add this method to handle axios interceptors
+  // Updated setupAxiosInterceptors to work with the api instance
   setupAxiosInterceptors: () => {
-    axios.interceptors.request.use((config) => {
-      const token = Cookies.get(TOKEN_COOKIE_NAME);
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    });
-
-    axios.interceptors.response.use(
+    api.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {

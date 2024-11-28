@@ -14,7 +14,6 @@ import { EventsService } from './events.service';
 import { OrganizerGuard } from '../guards/organizer.guard';
 import { Organizer } from '../decorators/organizer.decorator';
 import { CreateEventDto } from 'src/dto/create-event.dto';
-import { UpdateEventDto } from 'src/dto/update-event.dto';
 
 @Controller('events')
 export class EventsController {

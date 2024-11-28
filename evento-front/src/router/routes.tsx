@@ -11,6 +11,7 @@ import OriganizerLayout from "../Layouts/OrganizerLayout";
 import GuestLayout from "../Layouts/GuestLayout";
 import Dashboard from "../pages/organizer/OrganizerDashboard";
 import ParticipantDashboard from "../pages/participant/ParticipantDashboard";
+import EventsTable from "../pages/organizer/EventsTable";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -59,6 +60,10 @@ const organizerRoutes: RouteObject[] = [
       {
         path: "dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "events",
+        element: <EventsTable />,
       },
     ],
   },
