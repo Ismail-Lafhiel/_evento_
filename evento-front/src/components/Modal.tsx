@@ -12,7 +12,6 @@ const Modal = ({ isOpen, onClose, children, title }: ModalProps) => {
 
   return (
     <Fragment>
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity ${
           isOpen ? "opacity-100" : "opacity-0"
@@ -20,8 +19,6 @@ const Modal = ({ isOpen, onClose, children, title }: ModalProps) => {
         onClick={onClose}
         aria-hidden="true"
       />
-
-      {/* Modal */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center ${
           isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95"
@@ -31,7 +28,6 @@ const Modal = ({ isOpen, onClose, children, title }: ModalProps) => {
           className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto transform transition-all"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
               {title}

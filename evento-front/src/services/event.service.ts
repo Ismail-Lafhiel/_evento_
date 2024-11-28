@@ -11,7 +11,9 @@ export const eventService = {
   // Get all events
   getAllEvents: async (): Promise<Event[]> => {
     try {
-      const response = await api.get<ApiResponse<Event[]>>("/events");
+      const response = await api.get<ApiResponse<Event[]>>(
+        "/events?populate=location"
+      );
       return response.data.data;
     } catch (error: any) {
       throw new Error(
@@ -42,5 +44,5 @@ export const eventService = {
         error.response?.data?.message || "Failed to create event"
       );
     }
-  }
+  },
 };

@@ -1,10 +1,8 @@
 import { RouteObject } from "react-router-dom";
 import Home from "../pages/Home";
 import About from "../pages/About";
-import { GuestGuard } from "../components/guards/GuestGuard";
 import Register from "../pages/auth/Register";
 import Login from "../pages/auth/Login";
-import { RoleGuard } from "../components/guards/RoleGuard";
 import NotFound from "../pages/NotFound";
 import ParticipantLayout from "../Layouts/ParticipantLayout";
 import OriganizerLayout from "../Layouts/OrganizerLayout";
@@ -12,6 +10,8 @@ import GuestLayout from "../Layouts/GuestLayout";
 import Dashboard from "../pages/organizer/OrganizerDashboard";
 import ParticipantDashboard from "../pages/participant/ParticipantDashboard";
 import EventsTable from "../pages/organizer/EventsTable";
+import { GuestGuard } from "../components/guards/GuestGuard";
+import { RoleGuard } from "../components/guards/RoleGuard";
 
 const publicRoutes: RouteObject[] = [
   {
