@@ -65,4 +65,13 @@ export class EventsService {
       throw new NotFoundException('Invalid ID format');
     }
   }
+
+  async remove(id: string): Promise<void> {
+    this.validateObjectId(id);
+
+    const result = await this.eventModel.findByIdAndDelete(id).exec();
+    if (!result) {
+      throw new NotFoundException(`Event with ID ${id} not found`);
+    }
+  }
 }

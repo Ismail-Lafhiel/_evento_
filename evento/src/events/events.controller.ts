@@ -67,4 +67,15 @@ export class EventsController {
       data: event,
     };
   }
+
+  @Delete(':id')
+  @Organizer()
+  @UseGuards(OrganizerGuard)
+  async remove(@Param('id') id: string) {
+    await this.eventsService.remove(id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Event deleted successfully',
+    };
+  }
 }

@@ -45,7 +45,7 @@ export const eventService = {
       );
     }
   },
-  
+
   updateEvent: async (
     id: string,
     eventData: Partial<Event>
@@ -59,6 +59,16 @@ export const eventService = {
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || "Failed to update event"
+      );
+    }
+  },
+
+  deleteEvent: async (id: string): Promise<void> => {
+    try {
+      await api.delete(`/events/${id}`);
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Failed to delete event"
       );
     }
   },
