@@ -14,6 +14,7 @@ import { EventsService } from './events.service';
 import { OrganizerGuard } from '../guards/organizer.guard';
 import { Organizer } from '../decorators/organizer.decorator';
 import { CreateEventDto } from 'src/dto/create-event.dto';
+import { UpdateEventDto } from 'src/dto/update-event.dto';
 
 @Controller('events')
 export class EventsController {
@@ -52,5 +53,18 @@ export class EventsController {
     };
   }
 
-  
+  @Put(':id')
+  @Organizer()
+  @UseGuards(OrganizerGuard)
+  async update(
+    @Param('id') id: string,
+    @Body() updateEventDto: UpdateEventDto,
+  ) {
+    const event = await this.eventsService.update(id, updateEventDto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Event updated successfully',
+      data: event,
+    };
+  }
 }

@@ -11,20 +11,28 @@ import { locationService } from "../../services/location.service";
 import { eventService } from "../../services/event.service";
 import { toast } from "react-toastify";
 import CustomModal from "../../components/CustomModal";
+import { Link } from "react-router-dom";
 
 const EventsTable = () => {
+  // events states
   const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  //   location states
   const [locationsList, setLocationsList] = useState<Location[]>([]);
   const [locationsMap, setLocationsMap] = useState<{ [key: string]: Location }>(
     {}
   );
+  //   form states
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddParticipantModalOpen, setIsAddParticipantModalOpen] =
     useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const {
     register,
@@ -41,15 +49,11 @@ const EventsTable = () => {
         setIsLoading(true);
         setError(null);
 
-        const [fetchedEvents, fetchedLocations] = await Promise.all([
-          eventService.getAllEvents(),
-          locationService.getAllLocations(),
-        ]);
+        const fetchedEvents = await eventService.getAllEvents();
+        const fetchedLocations = await locationService.getAllLocations();
 
-        // Keep the original array for the select component
         setLocationsList(fetchedLocations);
 
-        // Create a map for location lookups
         const locationMap = fetchedLocations.reduce((acc, location) => {
           if (location._id) {
             acc[location._id] = location;
@@ -69,6 +73,20 @@ const EventsTable = () => {
 
     fetchData();
   }, [refreshTrigger]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        openDropdown &&
+        !(event.target as Element).closest(".dropdown-container")
+      ) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [openDropdown]);
 
   const refreshData = () => {
     setRefreshTrigger((prev) => prev + 1);
@@ -93,6 +111,23 @@ const EventsTable = () => {
     return "Location not found";
   };
 
+  //   open event modal with event data
+  const handleEditClick = (event: Event) => {
+    setSelectedEvent(event);
+    // Format date to YYYY-MM-DD for input type="date"
+    const formattedDate = new Date(event.date).toISOString().split("T")[0];
+
+    reset({
+      name: event.name,
+      sportType: event.sportType,
+      date: formattedDate,
+      location: event.location,
+      description: event.description,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  //   create event
   const createEvent = async (data: EventFormData) => {
     try {
       setIsSubmitting(true);
@@ -122,6 +157,49 @@ const EventsTable = () => {
     } catch (error: any) {
       console.error("Error creating event:", error);
       toast.error(error.message || "Failed to create event");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  // update event
+  const updateEvent = async (data: EventFormData) => {
+    try {
+      setIsSubmitting(true);
+
+      if (!selectedEvent?._id) return;
+
+      const eventData = {
+        name: data.name,
+        description: data.description,
+        sportType: data.sportType,
+        date: new Date(data.date),
+        location: data.location,
+        participants: selectedEvent.participants || [],
+      };
+
+      const updatedEvent = await eventService.updateEvent(
+        selectedEvent._id,
+        eventData
+      );
+
+      toast.success("Event updated successfully!");
+
+      reset({
+        name: "",
+        description: "",
+        sportType: "",
+        date: "",
+        location: "",
+      });
+
+      setIsEditModalOpen(false);
+      setSelectedEvent(null);
+      refreshData();
+
+      return updatedEvent;
+    } catch (error: any) {
+      console.error("Error updating event:", error);
+      toast.error(error.message || "Failed to update event");
     } finally {
       setIsSubmitting(false);
     }
@@ -301,7 +379,7 @@ const EventsTable = () => {
                         </th>
                         <td className="px-4 py-3">{event?.sportType}</td>
                         <td className="px-4 py-3">
-                          {getLocationString(event.location)}
+                          {getLocationString(event.location)}{" "}
                         </td>
                         <td className="px-4 py-3">
                           {" "}
@@ -317,10 +395,15 @@ const EventsTable = () => {
                             ? new Date(event.updatedAt).toLocaleDateString()
                             : "-"}
                         </td>
-                        <td className="px-4 py-3 flex items-center justify-end">
+
+                        <td className="px-4 py-3 flex items-center justify-end relative dropdown-container">
                           <button
-                            id="apple-imac-27-dropdown-button"
-                            data-dropdown-toggle="apple-imac-27-dropdown"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDropdown(
+                                openDropdown === event._id ? null : event._id
+                              );
+                            }}
                             className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
                             type="button"
                           >
@@ -335,37 +418,42 @@ const EventsTable = () => {
                             </svg>
                           </button>
                           <div
-                            id="apple-imac-27-dropdown"
-                            className="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+                            className={`absolute right-0 top-full mt-1 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 z-10 ${
+                              openDropdown === event._id ? "block" : "hidden"
+                            }`}
                           >
-                            <ul
-                              className="py-1 text-sm text-gray-700 dark:text-gray-200"
-                              aria-labelledby="apple-imac-27-dropdown-button"
-                            >
+                            <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
                               <li>
-                                <a
-                                  href="#"
+                                <Link
+                                  to="#"
+                                  onClick={() => setOpenDropdown(null)}
                                   className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                 >
                                   Show
-                                </a>
+                                </Link>
                               </li>
                               <li>
-                                <a
-                                  href="#"
-                                  className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                <button
+                                  onClick={() => {
+                                    setOpenDropdown(null);
+                                    handleEditClick(event);
+                                  }}
+                                  className="block w-full text-left py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                 >
                                   Edit
-                                </a>
+                                </button>
                               </li>
                             </ul>
                             <div className="py-1">
-                              <a
-                                href="#"
-                                className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                              <button
+                                onClick={() => {
+                                  setOpenDropdown(null);
+                                  setIsDeleteModalOpen(true);
+                                }}
+                                className="block w-full text-left py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                               >
                                 Delete
-                              </a>
+                              </button>
                             </div>
                           </div>
                         </td>
@@ -390,7 +478,7 @@ const EventsTable = () => {
       <CustomModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Add New Event"
+        title="Create New Event Form"
       >
         <form onSubmit={handleSubmit(createEvent)}>
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -539,6 +627,226 @@ const EventsTable = () => {
           </button>
         </form>
       </CustomModal>
+      {/* edit event modal */}
+      <CustomModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedEvent(null);
+          reset();
+        }}
+        title="Edit Event Form"
+      >
+        <form onSubmit={handleSubmit(updateEvent)}>
+          <div className="grid gap-4 mb-4 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="name"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Name
+                <span className="ml-1 text-red-500">*</span>
+              </label>
+              <FormInput
+                type="text"
+                id="name"
+                {...register("name")}
+                placeholder="Enter event name"
+              />
+              {errors.name && (
+                <p className="mt-1 ml-1 text-sm text-red-600">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="sportType"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Sport type
+                <span className="ml-1 text-red-500">*</span>
+              </label>
+              <FormInput
+                type="text"
+                id="sportType"
+                {...register("sportType")}
+                placeholder="Enter sport type"
+              />
+              {errors.sportType && (
+                <p className="mt-1 ml-1 text-sm text-red-600">
+                  {errors.sportType.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="date"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Event date
+                <span className="ml-1 text-red-500">*</span>
+              </label>
+              <FormInput
+                type="date"
+                id="date"
+                {...register("date")}
+                placeholder="Enter event date"
+              />
+              {errors.date && (
+                <p className="mt-1 ml-1 text-sm text-red-600">
+                  {errors.date.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="location"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Location
+                <span className="ml-1 text-red-500">*</span>
+              </label>
+              <LocationSelect
+                register={register}
+                errors={errors}
+                isLoading={isLoading}
+                locations={locationsList}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="description"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Description
+                <span className="ml-1 text-red-500">*</span>
+              </label>
+              <textarea
+                id="description"
+                {...register("description")}
+                className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="Write event description here"
+              ></textarea>
+              {errors.description && (
+                <p className="mt-1 ml-1 text-sm text-red-600">
+                  {errors.description.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="text-white inline-flex items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+          >
+            {isSubmitting ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Updating...
+              </>
+            ) : (
+              <>
+                <svg
+                  className="mr-1 -ml-1 w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Update event
+              </>
+            )}
+          </button>
+        </form>
+      </CustomModal>
+      {/* delete event modal */}
+      <div
+        className={`${
+          isDeleteModalOpen ? "block" : "hidden"
+        } overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full min-h-screen bg-gray-900/50 backdrop-blur-sm`}
+      >
+        <div className="relative p-4 w-full max-w-md">
+          <div className="relative p-4 text-center bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
+            <button
+              type="button"
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="text-gray-400 absolute top-2.5 right-2.5 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              data-modal-toggle="deleteModal"
+            >
+              <svg
+                aria-hidden="true"
+                className="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="sr-only">Close modal</span>
+            </button>
+            <svg
+              className="text-gray-400 dark:text-gray-500 w-11 h-11 mb-3.5 mx-auto"
+              aria-hidden="true"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="mb-4 text-gray-500 dark:text-gray-300">
+              Are you sure you want to delete this event?
+            </p>
+            <div className="flex justify-center items-center space-x-4">
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="py-2 px-3 text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+              >
+                No, cancel
+              </button>
+              <button
+                type="submit"
+                className="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-900"
+              >
+                Yes, I'm sure
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* add participant */}
       <CustomModal
         isOpen={isAddParticipantModalOpen}
@@ -546,7 +854,7 @@ const EventsTable = () => {
         title="Add Participant"
       >
         <form>
-            <div>add paticipant</div>
+          <div>add paticipant</div>
         </form>
       </CustomModal>
     </section>
