@@ -163,31 +163,44 @@ const EventsTable = () => {
   // update event
   const updateEvent = async (data: EventFormData) => {
     try {
+      setIsSubmitting(true);
+
       if (!selectedEvent?._id) return;
 
-      const updatedEvent = await eventService.updateEvent(selectedEvent._id, {
-        ...data,
-        date: new Date(data.date).toISOString(),
-      });
+      const eventData = {
+        name: data.name,
+        description: data.description,
+        sportType: data.sportType,
+        date: new Date(data.date),
+        location: data.location,
+        participants: selectedEvent.participants || [], // preserve existing participants
+      };
 
-      // Show success notification
+      const updatedEvent = await eventService.updateEvent(
+        selectedEvent._id,
+        eventData
+      );
+
       toast.success("Event updated successfully!");
 
-      // Refresh the events list
+      reset({
+        name: "",
+        description: "",
+        sportType: "",
+        date: "",
+        location: "",
+      });
+
+      setIsEditModalOpen(false);
+      setSelectedEvent(null);
       refreshData();
 
-      // Close the modal
-      setIsEditModalOpen(false);
-
-      // Clear the selected event
-      setSelectedEvent(null);
-
-      // Reset the form
-      reset();
+      return updatedEvent;
     } catch (error: any) {
-      // Show error notification
-      toast.error(error.message || "Failed to update event");
       console.error("Error updating event:", error);
+      toast.error(error.message || "Failed to update event");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
