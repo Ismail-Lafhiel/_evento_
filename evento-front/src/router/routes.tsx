@@ -10,8 +10,8 @@ import GuestLayout from "../Layouts/GuestLayout";
 import Dashboard from "../pages/organizer/OrganizerDashboard";
 import ParticipantDashboard from "../pages/participant/ParticipantDashboard";
 import EventsTable from "../pages/organizer/EventsTable";
-import { GuestGuard } from "../components/guards/GuestGuard";
-import { RoleGuard } from "../components/guards/RoleGuard";
+import { GuestGuard } from "../guards/GuestGuard";
+import { RoleGuard } from "../guards/RoleGuard";
 
 const publicRoutes: RouteObject[] = [
   {

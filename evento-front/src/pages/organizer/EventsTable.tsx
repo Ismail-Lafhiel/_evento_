@@ -12,6 +12,8 @@ import { eventService } from "../../services/event.service";
 import { toast } from "react-toastify";
 import CustomModal from "../../components/CustomModal";
 import { Link } from "react-router-dom";
+import { userService } from "../../services/user.service";
+import { User } from "../../types/types";
 
 const EventsTable = () => {
   // events states
@@ -31,6 +33,11 @@ const EventsTable = () => {
   const [locationsMap, setLocationsMap] = useState<{ [key: string]: Location }>(
     {}
   );
+  //   participants states
+  const [participantsList, setParticipantsList] = useState<User[]>([]);
+  const [participantsMap, setParticipantsMap] = useState<{
+    [key: string]: User;
+  }>({});
   //   form states
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,23 +62,46 @@ const EventsTable = () => {
         setIsLoading(true);
         setError(null);
 
-        const fetchedEvents = await eventService.getAllEvents();
-        const fetchedLocations = await locationService.getAllLocations();
+        // Fetch all data in parallel using Promise.all
+        const [fetchedEvents, fetchedLocations, fetchedParticipants] =
+          await Promise.all([
+            eventService.getAllEvents(),
+            locationService.getAllLocations(),
+            userService.getAllParticipants(),
+          ]);
 
-        setLocationsList(fetchedLocations);
+        // Log participants to check the data
+        console.log("Fetched Participants:", fetchedParticipants);
 
-        const locationMap = fetchedLocations.reduce((acc, location) => {
-          if (location._id) {
+        // Set events (with check)
+        setEvents(fetchedEvents || []);
+
+        // Set locations (with checks)
+        setLocationsList(fetchedLocations || []);
+        const locationMap = (fetchedLocations || []).reduce((acc, location) => {
+          if (location?._id) {
             acc[location._id] = location;
           }
           return acc;
         }, {} as { [key: string]: Location });
-
-        setEvents(fetchedEvents);
         setLocationsMap(locationMap);
+
+        // Set participants (with checks)
+        setParticipantsList(fetchedParticipants || []);
+        const participantsMap = (fetchedParticipants || []).reduce(
+          (acc, participant) => {
+            if (participant?._id) {
+              acc[participant._id] = participant;
+            }
+            return acc;
+          },
+          {} as { [key: string]: User }
+        );
+        setParticipantsMap(participantsMap);
       } catch (error: any) {
         setError(error.message || "Failed to fetch data");
         console.error("Error fetching data:", error);
+        toast.error(error.message || "Failed to fetch data");
       } finally {
         setIsLoading(false);
       }
