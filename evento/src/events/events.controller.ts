@@ -78,4 +78,30 @@ export class EventsController {
       message: 'Event deleted successfully',
     };
   }
+
+  @Post(':id/participants/:userId')
+  async addParticipant(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ) {
+    const event = await this.eventsService.addParticipant(id, userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Participant added successfully',
+      data: event,
+    };
+  }
+
+  @Delete(':id/participants/:userId')
+  async removeParticipant(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ) {
+    const event = await this.eventsService.removeParticipant(id, userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Participant removed successfully',
+      data: event,
+    };
+  }
 }

@@ -74,4 +74,47 @@ export class EventsService {
       throw new NotFoundException(`Event with ID ${id} not found`);
     }
   }
+
+  // handling participants
+  async addParticipant(eventId: string, userId: string): Promise<Event> {
+    this.validateObjectId(eventId);
+    this.validateObjectId(userId);
+
+    const event = await this.eventModel
+      .findByIdAndUpdate(
+        eventId,
+        { $addToSet: { participants: userId } },
+        { new: true },
+      )
+      .populate('location')
+      .populate('participants')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+
+    return event;
+  }
+
+  async removeParticipant(eventId: string, userId: string): Promise<Event> {
+    this.validateObjectId(eventId);
+    this.validateObjectId(userId);
+
+    const event = await this.eventModel
+      .findByIdAndUpdate(
+        eventId,
+        { $pull: { participants: userId } },
+        { new: true },
+      )
+      .populate('location')
+      .populate('participants')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+
+    return event;
+  }
 }
