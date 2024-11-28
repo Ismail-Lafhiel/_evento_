@@ -45,4 +45,21 @@ export const eventService = {
       );
     }
   },
+  
+  updateEvent: async (
+    id: string,
+    eventData: Partial<Event>
+  ): Promise<Event> => {
+    try {
+      const response = await api.put<ApiResponse<Event>>(
+        `/events/${id}`,
+        eventData
+      );
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update event"
+      );
+    }
+  },
 };
