@@ -1,9 +1,9 @@
-import Cookies from 'js-cookie';
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import Cookies from "js-cookie";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
-const TOKEN_COOKIE_NAME = 'access_token';
-const EVENTO_URL = 'http://localhost:3001'; // adjust as needed
+const TOKEN_COOKIE_NAME = "access_token";
+const EVENTO_URL = import.meta.env.VITE_EVENTO_URL;
 
 interface User {
   id: string;
@@ -11,6 +11,13 @@ interface User {
   email: string;
   role: string;
   fullname: string;
+}
+
+export interface RegisterData {
+  fullname: string;
+  username: string;
+  email: string;
+  password: string;
 }
 
 interface AuthResponse {
@@ -23,12 +30,28 @@ interface AuthResponse {
 }
 
 export const authService = {
+  register: async (userData: RegisterData) => {
+    try {
+      const response = await axios.post(
+        `${EVENTO_URL}/users/register`,
+        userData
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      throw new Error(error.response?.data?.message || "Registration failed");
+    }
+  },
+
   login: async (username: string, password: string) => {
     try {
-      const response = await axios.post<AuthResponse>(`${EVENTO_URL}/users/login`, {
-        username,
-        password,
-      });
+      const response = await axios.post<AuthResponse>(
+        `${EVENTO_URL}/users/login`,
+        {
+          username,
+          password,
+        }
+      );
 
       const { access_token, user } = response.data.data;
 
@@ -41,7 +64,7 @@ export const authService = {
       });
 
       // Store user data
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user));
 
       return { access_token, user };
     } catch (error: any) {
@@ -52,7 +75,7 @@ export const authService = {
 
   logout: () => {
     Cookies.remove(TOKEN_COOKIE_NAME);
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
   },
 
   getToken: () => {
@@ -74,7 +97,7 @@ export const authService = {
 
   getCurrentUser: (): User | null => {
     try {
-      const userStr = localStorage.getItem('user');
+      const userStr = localStorage.getItem("user");
       if (!userStr) return null;
       return JSON.parse(userStr);
     } catch {
@@ -106,5 +129,5 @@ export const authService = {
         return Promise.reject(error);
       }
     );
-  }
+  },
 };
