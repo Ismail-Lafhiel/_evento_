@@ -72,4 +72,18 @@ export const eventService = {
       );
     }
   },
+
+  addParticipant: async (eventId: string, userId: string): Promise<Event> => {
+    try {
+      const response = await api.post<ApiResponse<Event>>(
+        `/events/${eventId}/participants/${userId}`
+      );
+      return response.data.data;
+    } catch (error: any) {
+      console.error("Error details:", error.response);
+      throw new Error(
+        error.response?.data?.message || "Failed to add participant"
+      );
+    }
+  },
 };

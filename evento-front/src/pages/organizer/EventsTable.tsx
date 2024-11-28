@@ -14,6 +14,17 @@ import CustomModal from "../../components/CustomModal";
 import { Link } from "react-router-dom";
 import { userService } from "../../services/user.service";
 import { User } from "../../types/types";
+import Select from "react-select";
+
+interface ParticipantOption {
+  value: string;
+  label: string;
+}
+
+interface EventOption {
+  value: string;
+  label: string;
+}
 
 const EventsTable = () => {
   // events states
@@ -38,6 +49,10 @@ const EventsTable = () => {
   const [participantsMap, setParticipantsMap] = useState<{
     [key: string]: User;
   }>({});
+  const [selectedParticipants, setSelectedParticipants] = useState<
+    ParticipantOption[]
+  >([]);
+  const [isAddingParticipants, setIsAddingParticipants] = useState(false);
   //   form states
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,9 +84,6 @@ const EventsTable = () => {
             locationService.getAllLocations(),
             userService.getAllParticipants(),
           ]);
-
-        // Log participants to check the data
-        console.log("Fetched Participants:", fetchedParticipants);
 
         // Set events (with check)
         setEvents(fetchedEvents || []);
@@ -257,6 +269,58 @@ const EventsTable = () => {
       toast.error(error.message || "Failed to delete event");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  // handle adding participant to event
+  // Convert participants to options format
+  const participantOptions: ParticipantOption[] = participantsList.map(
+    (participant) => ({
+      value: participant._id,
+      label: participant.fullname || participant.username,
+    })
+  );
+  // Convert events to options format
+  const eventOptions: EventOption[] = events.map((event) => ({
+    value: event._id,
+    label: event.name,
+  }));
+
+  const handleParticipantChange = (selected: readonly ParticipantOption[]) => {
+    setSelectedParticipants(selected as ParticipantOption[]);
+  };
+
+  const handleEventChange = (selected: EventOption | null) => {
+    setSelectedEvent(selected);
+  };
+
+  const addParticipant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedParticipants.length || !selectedEvent) {
+      toast.error("Please select both event and participants");
+      return;
+    }
+
+    try {
+      setIsAddingParticipants(true);
+
+      // Process all participants sequentially
+      await Promise.all(
+        selectedParticipants.map((participant) =>
+          eventService.addParticipant(selectedEvent.value, participant.value)
+        )
+      );
+
+      toast.success("Participants added successfully!");
+      setIsAddParticipantModalOpen(false);
+      setSelectedParticipants([]);
+      setSelectedEvent(null);
+      refreshData();
+    } catch (error: any) {
+      console.error("Error adding participants:", error);
+      toast.error(error.message || "Failed to add participants");
+    } finally {
+      setIsAddingParticipants(false);
     }
   };
 
@@ -934,11 +998,109 @@ const EventsTable = () => {
       {/* add participant */}
       <CustomModal
         isOpen={isAddParticipantModalOpen}
-        onClose={() => setIsAddParticipantModalOpen(false)}
-        title="Add Participant"
+        onClose={() => {
+          setIsAddParticipantModalOpen(false);
+          setSelectedParticipants([]);
+          setSelectedEvent(null);
+        }}
+        title="Add Participants to Event"
       >
-        <form>
-          <div>add paticipant</div>
+        <form onSubmit={addParticipant} className="space-y-4">
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+            {/* Event Selection */}
+            <div className="space-y-2">
+              <label
+                htmlFor="event"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Select Event
+              </label>
+              <Select
+                id="event"
+                options={eventOptions}
+                value={selectedEvent}
+                onChange={handleEventChange}
+                className="basic-select"
+                classNamePrefix="select"
+                placeholder="Select event..."
+                isSearchable
+                isDisabled={isAddingParticipants}
+              />
+            </div>
+
+            {/* Participants Selection */}
+            <div className="space-y-2">
+              <label
+                htmlFor="participants"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Select Participants
+              </label>
+              <Select
+                id="participants"
+                isMulti
+                options={participantOptions}
+                value={selectedParticipants}
+                onChange={handleParticipantChange}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                placeholder="Select participants..."
+                isSearchable
+                closeMenuOnSelect={false}
+                maxMenuHeight={200}
+                menuPlacement="auto"
+                isDisabled={isAddingParticipants}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4 border-t mt-4">
+            <button
+              type="button"
+              onClick={() => {
+                setIsAddParticipantModalOpen(false);
+                setSelectedParticipants([]);
+                setSelectedEvent(null);
+              }}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              disabled={isAddingParticipants}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 disabled:bg-primary-400 disabled:cursor-not-allowed"
+              disabled={
+                isAddingParticipants ||
+                selectedParticipants.length === 0 ||
+                !selectedEvent
+              }
+            >
+              {isAddingParticipants ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Adding...
+                </span>
+              ) : (
+                "Add Participants"
+              )}
+            </button>
+          </div>
         </form>
       </CustomModal>
     </section>
