@@ -12,6 +12,7 @@ import ParticipantDashboard from "../pages/participant/ParticipantDashboard";
 import EventsTable from "../pages/organizer/EventsTable";
 import { GuestGuard } from "../guards/GuestGuard";
 import { RoleGuard } from "../guards/RoleGuard";
+import ViewEvent from "../pages/organizer/ViewEvent";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -65,6 +66,10 @@ const organizerRoutes: RouteObject[] = [
         path: "events",
         element: <EventsTable />,
       },
+      {
+        path: "events/:id",
+        element: <ViewEvent />,
+      }
     ],
   },
 ];

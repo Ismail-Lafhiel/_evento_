@@ -4,6 +4,7 @@ import { Model, isValidObjectId } from 'mongoose';
 import { Event, eventDocument } from '../schemas/event.schema';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from 'src/dto/update-event.dto';
+import { User } from 'src/schemas/user.schema';
 
 @Injectable()
 export class EventsService {
@@ -76,6 +77,38 @@ export class EventsService {
   }
 
   // handling participants
+
+  async getEventWithParticipants(eventId: string): Promise<{
+    eventId: string;
+    eventName: string;
+    description: string;
+    sportType: string;
+    date: Date;
+    participants: User[];
+    participantCount: number;
+  }> {
+    this.validateObjectId(eventId);
+
+    const event = await this.eventModel
+      .findById(eventId)
+      .populate('participants')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+
+    return {
+      eventId: event._id.toString(),
+      eventName: event.name,
+      description: event.description,
+      sportType: event.sportType,
+      date: event.date,
+      participants: event.participants,
+      participantCount: event.participants.length,
+    };
+  }
+
   async addParticipant(eventId: string, userId: string): Promise<Event> {
     this.validateObjectId(eventId);
     this.validateObjectId(userId);

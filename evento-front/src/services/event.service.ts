@@ -86,4 +86,17 @@ export const eventService = {
       );
     }
   },
+
+  getEventWithParticipants: async (id: string): Promise<Event> => {
+    try {
+      const response = await api.get<ApiResponse<Event>>(`/events/${id}`);
+      return response.data.data;
+    } catch (error: any) {
+      console.error("Error details:", error.response);
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to fetch event with participants"
+      );
+    }
+  },
 };

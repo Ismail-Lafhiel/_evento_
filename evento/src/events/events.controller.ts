@@ -79,6 +79,11 @@ export class EventsController {
     };
   }
 
+  @Get(':id/participants')
+  async getEventWithParticipants(@Param('id') id: string) {
+    return this.eventsService.getEventWithParticipants(id);
+  }
+
   @Post(':id/participants/:userId')
   async addParticipant(
     @Param('id') id: string,
