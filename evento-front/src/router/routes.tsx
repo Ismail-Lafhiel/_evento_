@@ -13,6 +13,7 @@ import EventsTable from "../pages/organizer/EventsTable";
 import { GuestGuard } from "../guards/GuestGuard";
 import { RoleGuard } from "../guards/RoleGuard";
 import ViewEvent from "../pages/organizer/ViewEvent";
+import Contact from "../pages/Contact";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -26,6 +27,10 @@ const publicRoutes: RouteObject[] = [
       {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "contact",
+        element: <Contact />,
       },
       // Guest routes (only for non-authenticated users)
       {

@@ -58,14 +58,12 @@ const OrganizerLayout = () => {
         {/* Sidebar Header */}
         <div className="flex items-center p-4 border-b border-gray-100">
           <div className="flex items-center space-x-3">
-            {/* <img
-              src="/logo.png" // Add your logo
-              alt="Logo"
-              className="h-8 w-8"
-            /> */}
+            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xl">E</span>
+            </div>{" "}
             {isSidebarOpen && (
               <h2 className="text-xl font-bold text-gray-800 tracking-tight">
-                Evento
+                <Link to="/">Evento</Link>
               </h2>
             )}
           </div>
