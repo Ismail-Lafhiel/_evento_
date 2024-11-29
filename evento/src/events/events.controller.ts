@@ -8,6 +8,7 @@ import {
   Param,
   UseGuards,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 
@@ -34,13 +35,19 @@ export class EventsController {
 
   @Get()
   async findAll() {
-    const { data, count } = await this.eventsService.findAll();
-    return {
-      statusCode: HttpStatus.OK,
-      message: count > 0 ? 'Events retrieved successfully' : 'No events found',
-      data: data,
-      count: count,
-    };
+    try {
+      const events = await this.eventsService.findAll();
+      return {
+        success: true,
+        data: events.data,
+        count: events.count,
+      };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch events',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get(':id')

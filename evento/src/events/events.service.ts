@@ -18,16 +18,20 @@ export class EventsService {
   }
 
   async findAll(): Promise<{ data: Event[]; count: number }> {
-    const events = await this.eventModel
-      .find()
-      .populate('location')
-      .populate('participants')
-      .exec();
+    try {
+      const events = await this.eventModel
+        .find()
+        .populate('location')
+        .populate('participants')
+        .exec();
 
-    return {
-      data: events,
-      count: events.length,
-    };
+      return {
+        data: events,
+        count: events.length,
+      };
+    } catch (error) {
+      throw new Error('Failed to fetch events');
+    }
   }
 
   async findOne(id: string): Promise<Event> {

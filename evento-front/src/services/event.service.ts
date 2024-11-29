@@ -9,12 +9,10 @@ interface ApiResponse<T> {
 
 export const eventService = {
   // Get all events
-  getAllEvents: async (): Promise<Event[]> => {
+  getAllEvents: async () => {
     try {
-      const response = await api.get<ApiResponse<Event[]>>(
-        "/events?populate=location"
-      );
-      return response.data.data;
+      const response = await api.get("/events");
+      return response.data;
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || "Failed to fetch events"

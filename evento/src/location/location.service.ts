@@ -18,11 +18,15 @@ export class LocationService {
   }
 
   async findAll(): Promise<{ data: Location[]; count: number }> {
-    const locations = await this.locationModel.find().exec();
-    return {
-      data: locations,
-      count: locations.length,
-    };
+    try {
+      const locations = await this.locationModel.find().exec();
+      return {
+        data: locations,
+        count: locations.length,
+      };
+    } catch (error) {
+      throw new Error('Failed to fetch locations');
+    }
   }
 
   async findOne(id: string): Promise<Location> {

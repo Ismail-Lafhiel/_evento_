@@ -9,12 +9,14 @@ interface ApiResponse<T> {
 
 export const locationService = {
   // Get all locations
-  getAllLocations: async (): Promise<Location[]> => {
+  getAllLocations: async () => {
     try {
-      const response = await api.get<ApiResponse<Location[]>>('/locations');
-      return response.data.data;
+      const response = await api.get("/locations");
+      return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to fetch locations");
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch locations"
+      );
     }
   },
 
@@ -24,27 +26,44 @@ export const locationService = {
       const response = await api.get<ApiResponse<Location>>(`/locations/${id}`);
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to fetch location");
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch location"
+      );
     }
   },
 
   // Create new location
-  createLocation: async (locationData: Omit<Location, '_id' | 'createdAt' | 'updatedAt'>): Promise<Location> => {
+  createLocation: async (
+    locationData: Omit<Location, "_id" | "createdAt" | "updatedAt">
+  ): Promise<Location> => {
     try {
-      const response = await api.post<ApiResponse<Location>>('/locations', locationData);
+      const response = await api.post<ApiResponse<Location>>(
+        "/locations",
+        locationData
+      );
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to create location");
+      throw new Error(
+        error.response?.data?.message || "Failed to create location"
+      );
     }
   },
 
   // Update location
-  updateLocation: async (id: string, locationData: Partial<Location>): Promise<Location> => {
+  updateLocation: async (
+    id: string,
+    locationData: Partial<Location>
+  ): Promise<Location> => {
     try {
-      const response = await api.put<ApiResponse<Location>>(`/locations/${id}`, locationData);
+      const response = await api.put<ApiResponse<Location>>(
+        `/locations/${id}`,
+        locationData
+      );
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to update location");
+      throw new Error(
+        error.response?.data?.message || "Failed to update location"
+      );
     }
   },
 
@@ -53,7 +72,9 @@ export const locationService = {
     try {
       await api.delete(`/locations/${id}`);
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to delete location");
+      throw new Error(
+        error.response?.data?.message || "Failed to delete location"
+      );
     }
-  }
+  },
 };

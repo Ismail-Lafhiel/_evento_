@@ -17,9 +17,7 @@ export const userService = {
       const response = await api.get<ApiResponse<ParticipantsResponse>>(
         "/users/participants"
       );
-      if (!Array.isArray(response.data.data.participants)) {
-        throw new Error("Invalid response format");
-      }
+      console.log("Participants Response:", response.data);
       return response.data.data;
     } catch (error: any) {
       console.error("API Error:", error);

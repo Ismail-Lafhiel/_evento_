@@ -85,34 +85,46 @@ const EventsTable = () => {
             userService.getAllParticipants(),
           ]);
 
-        // Set events (with check)
-        setEvents(fetchedEvents || []);
+        console.log("Participants Response:", participantsResponse);
 
-        // Set locations (with checks)
-        setLocationsList(fetchedLocations || []);
-        const locationMap = (fetchedLocations || []).reduce((acc, location) => {
-          if (location?._id) {
-            acc[location._id] = location;
-          }
-          return acc;
-        }, {} as { [key: string]: Location });
-        setLocationsMap(locationMap);
+        // Set events
+        setEvents(fetchedEvents.data || []);
 
-        // Set participants (with checks)
-        // Extract participants array from the response
-        const fetchedParticipants = participantsResponse.participants || [];
-        setParticipantsList(fetchedParticipants);
-
-        const participantsMap = fetchedParticipants.reduce(
-          (acc, participant) => {
-            if (participant?._id) {
-              acc[participant._id] = participant;
+        // Set locations
+        setLocationsList(fetchedLocations.data || []);
+        const locationMap = (fetchedLocations.data || []).reduce(
+          (acc, location) => {
+            if (location?._id) {
+              acc[location._id] = location;
             }
             return acc;
           },
-          {} as { [key: string]: User }
+          {} as { [key: string]: Location }
         );
-        setParticipantsMap(participantsMap);
+        setLocationsMap(locationMap);
+
+        // Set participants
+        if (participantsResponse && participantsResponse.participants) {
+          setParticipantsList(participantsResponse.participants);
+
+          const participantsMap = participantsResponse.participants.reduce(
+            (acc, participant) => {
+              if (participant?._id) {
+                acc[participant._id] = participant;
+              }
+              return acc;
+            },
+            {} as { [key: string]: User }
+          );
+          setParticipantsMap(participantsMap);
+        } else {
+          console.warn(
+            "No participants data in response:",
+            participantsResponse
+          );
+          setParticipantsList([]);
+          setParticipantsMap({});
+        }
       } catch (error: any) {
         setError(error.message || "Failed to fetch data");
         console.error("Error fetching data:", error);
