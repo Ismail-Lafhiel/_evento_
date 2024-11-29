@@ -6,7 +6,7 @@ import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
   HomeIcon,
-  TagIcon,
+  MapPinIcon,
   TicketIcon,
 } from "@heroicons/react/16/solid";
 
@@ -86,8 +86,8 @@ const OrganizerLayout = () => {
                     : "hover:bg-gray-50"
                 }`}
               >
-                <TagIcon className="w-6 h-6" />
-                {isSidebarOpen && <span className="ml-3">Categories</span>}
+                <MapPinIcon className="w-6 h-6" />
+                {isSidebarOpen && <span className="ml-3">Locations</span>}
               </Link>
             </li>
             <li>
