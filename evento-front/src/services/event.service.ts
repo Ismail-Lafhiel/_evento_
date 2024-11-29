@@ -99,4 +99,21 @@ export const eventService = {
       );
     }
   },
+
+  removeParticipant: async (
+    eventId: string,
+    userId: string
+  ): Promise<Event> => {
+    try {
+      const response = await api.delete<ApiResponse<Event>>(
+        `/events/${eventId}/${userId}`
+      );
+      return response.data.data;
+    } catch (error: any) {
+      console.error("Error details:", error.response);
+      throw new Error(
+        error.response?.data?.message || "Failed to remove participant"
+      );
+    }
+  },
 };

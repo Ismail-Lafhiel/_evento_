@@ -97,7 +97,7 @@ export class EventsController {
     };
   }
 
-  @Delete(':id/participants/:userId')
+  @Delete(':id/:userId')
   async removeParticipant(
     @Param('id') id: string,
     @Param('userId') userId: string,

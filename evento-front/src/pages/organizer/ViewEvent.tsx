@@ -13,12 +13,9 @@ const ViewEvent = () => {
     const fetchEvent = async () => {
       try {
         if (!id) return;
-        console.log("Fetching event with ID:", id); // Debug log
-        const eventData = await eventService.getEventById(id); // Using getEventById instead
-        console.log("Received event data:", eventData); // Debug log
+        const eventData = await eventService.getEventById(id);
         setEvent(eventData);
       } catch (err) {
-        console.error("Error fetching event:", err); // Debug log
         setError(err instanceof Error ? err.message : "Failed to fetch event");
       } finally {
         setLoading(false);
@@ -69,7 +66,7 @@ const ViewEvent = () => {
                       <td className="py-2">{participant.fullname}</td>
                       <td className="py-2">{participant.email}</td>
                       <td className="py-2">
-                        {/* <button
+                        <button
                           onClick={() => {
                             if (
                               window.confirm(
@@ -94,10 +91,10 @@ const ViewEvent = () => {
                                 );
                             }
                           }}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-600 hover:text-red-800 text-sm"
                         >
                           Remove
-                        </button> */}
+                        </button>
                       </td>
                     </tr>
                   ))}
