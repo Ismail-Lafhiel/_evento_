@@ -102,29 +102,88 @@ const Register = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-screen">
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <Link to="/" className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">E</span>
+    <div className="flex bg-white dark:bg-gray-900">
+      {/* Left Side - Logo and Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-500 to-primary-700 p-12 items-center justify-center">
+        <div className="max-w-lg">
+          <Link to="/" className="flex items-center mb-8">
+            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center">
+              <span className="text-3xl font-bold text-primary-600">E</span>
             </div>
           </Link>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-4xl font-bold text-white mb-6">
+            Join Evento Today
+          </h1>
+          <p className="text-lg text-primary-100 mb-8">
+            Create an account and start your journey in the world of sports
+            events. Participate, compete, and connect with other athletes.
+          </p>
+          <div className="grid grid-cols-2 gap-4 text-primary-100">
+            <div className="flex items-center">
+              <svg
+                className="w-6 h-6 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+              </svg>
+              <span>Create Profile</span>
+            </div>
+            <div className="flex items-center">
+              <svg
+                className="w-6 h-6 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z" />
+              </svg>
+              <span>Join Events</span>
+            </div>
+            <div className="flex items-center">
+              <svg
+                className="w-6 h-6 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+              </svg>
+              <span>Meet Athletes</span>
+            </div>
+            <div className="flex items-center">
+              <svg
+                className="w-6 h-6 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+              </svg>
+              <span>Track Progress</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          <div className="lg:hidden text-center mb-6">
+            <Link to="/" className="inline-block mb-2">
+              <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center">
+                <span className="text-2xl font-bold text-white">E</span>
+              </div>
+            </Link>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Create your account
           </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
             Join us and start participating in sports events
           </p>
-        </div>
 
-        {/* Registration Form */}
-        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {/* Full Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
                 Full Name
               </label>
               <div className="relative">
@@ -149,7 +208,7 @@ const Register = () => {
 
             {/* Username */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
                 Username
               </label>
               <div className="relative">
@@ -174,7 +233,7 @@ const Register = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -197,9 +256,9 @@ const Register = () => {
               )}
             </div>
 
-            {/* Password */}
+            {/* Password Fields */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -214,17 +273,9 @@ const Register = () => {
                   className="pl-10"
                 />
               </div>
-              {errors.password && (
-                <p className="mt-2 text-sm text-red-600 dark:text-red-500 flex items-center">
-                  <span className="mr-1">•</span>
-                  {errors.password.message}
-                </p>
-              )}
             </div>
-
-            {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
                 Confirm Password
               </label>
               <div className="relative">
@@ -247,20 +298,20 @@ const Register = () => {
               )}
             </div>
             {/* Password Requirements */}
-            <div className="mt-2 space-y-2">
+            <div className="mt-4 space-y-2">
               {passwordRequirements.map((req, index) => (
                 <div key={index} className="flex items-center text-sm">
                   <CheckCircleIcon
                     className={`h-4 w-4 mr-2 ${
-                      password?.match(req.regex)
+                      password && req.regex.test(password)
                         ? "text-green-500"
                         : "text-gray-300"
                     }`}
                   />
                   <span
                     className={`${
-                      password?.match(req.regex)
-                        ? "text-green-600 dark:text-green-400"
+                      password && req.regex.test(password)
+                        ? "text-green-500"
                         : "text-gray-500"
                     }`}
                   >
@@ -269,11 +320,12 @@ const Register = () => {
                 </div>
               ))}
             </div>
+
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -300,11 +352,11 @@ const Register = () => {
                   Creating account...
                 </>
               ) : (
-                "Create Account"
+                "Create account"
               )}
             </button>
 
-            {/* Login Link */}
+            {/* Sign In Link */}
             <p className="text-center text-sm text-gray-600 dark:text-gray-300">
               Already have an account?{" "}
               <Link

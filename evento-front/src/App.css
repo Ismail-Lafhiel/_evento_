@@ -44,7 +44,6 @@
   }
 }
 
-
 @media print {
   .print:hidden {
     display: none !important;
@@ -69,6 +68,6 @@
     background: white;
   }
   @page {
-    margin: 2cm;
+    margin: 3.5cm 2cm;
   }
 }

@@ -28,7 +28,6 @@ interface EventOption {
 
 const EventsTable = () => {
   // events states
-  //   map events
   const [events, setEvents] = useState<Event[]>([]);
   //   create
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -62,6 +61,13 @@ const EventsTable = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  //
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const eventsPerPage = 5;
+
   const {
     register,
     reset,
@@ -80,15 +86,17 @@ const EventsTable = () => {
         // Fetch all data in parallel using Promise.all
         const [fetchedEvents, fetchedLocations, participantsResponse] =
           await Promise.all([
-            eventService.getAllEvents(),
+            eventService.getAllEvents(currentPage, eventsPerPage, searchTerm),
             locationService.getAllLocations(),
             userService.getAllParticipants(),
           ]);
 
         console.log("Participants Response:", participantsResponse);
 
-        // Set events
+        // Set events with pagination data
         setEvents(fetchedEvents.data || []);
+        setTotalCount(fetchedEvents.count || 0);
+        setTotalPages(Math.ceil((fetchedEvents.count || 0) / eventsPerPage));
 
         // Set locations
         setLocationsList(fetchedLocations.data || []);
@@ -135,7 +143,7 @@ const EventsTable = () => {
     };
 
     fetchData();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, currentPage, searchTerm]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -345,35 +353,32 @@ const EventsTable = () => {
         <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
             <div className="w-full md:w-1/2">
-              <form className="flex items-center">
-                <label htmlFor="simple-search" className="sr-only">
-                  Search
-                </label>
-                <div className="relative w-full">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg
-                      aria-hidden="true"
-                      className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    id="simple-search"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    placeholder="Search"
-                    required
-                  />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg
+                    className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </div>
-              </form>
+                <input
+                  type="text"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="Search events..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
             </div>
             <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
               <button
@@ -509,7 +514,9 @@ const EventsTable = () => {
                           scope="row"
                           className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         >
-                          {event?.name}
+                          <Link to={`/organizer/events/${event._id}`}>
+                            {event?.name}
+                          </Link>
                         </th>
                         <td className="px-4 py-3">{event?.sportType}</td>
                         <td className="px-4 py-3">
@@ -606,7 +613,64 @@ const EventsTable = () => {
               </table>
             )}
           </div>
-          {/* pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 dark:bg-gray-800 dark:border-gray-700">
+              <div className="flex flex-1 justify-between sm:hidden">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    Showing{" "}
+                    <span className="font-medium">
+                      {(currentPage - 1) * eventsPerPage + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium">
+                      {Math.min(currentPage * eventsPerPage, totalCount)}
+                    </span>{" "}
+                    of <span className="font-medium">{totalCount}</span> results
+                  </p>
+                </div>
+                <div>
+                  <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (number) => (
+                        <button
+                          key={number}
+                          onClick={() => setCurrentPage(number)}
+                          className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                            currentPage === number
+                              ? "z-10 bg-primary-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                              : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:text-gray-300 dark:ring-gray-600 dark:hover:bg-gray-700"
+                          }`}
+                        >
+                          {number}
+                        </button>
+                      )
+                    )}
+                  </nav>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {/* create event modal */}
