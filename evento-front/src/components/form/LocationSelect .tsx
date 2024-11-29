@@ -41,16 +41,10 @@ const LocationSelect = ({
 
   return (
     <div className="relative">
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-          {label}
-        </label>
-      )}
       <Listbox
         value={value}
         onChange={(val) => {
           onChange?.(val);
-          // Trigger react-hook-form onChange
           const event = {
             target: {
               name: "location",
