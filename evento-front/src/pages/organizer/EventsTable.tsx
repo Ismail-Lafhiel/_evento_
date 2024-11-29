@@ -78,7 +78,7 @@ const EventsTable = () => {
         setError(null);
 
         // Fetch all data in parallel using Promise.all
-        const [fetchedEvents, fetchedLocations, fetchedParticipants] =
+        const [fetchedEvents, fetchedLocations, participantsResponse] =
           await Promise.all([
             eventService.getAllEvents(),
             locationService.getAllLocations(),
@@ -99,8 +99,11 @@ const EventsTable = () => {
         setLocationsMap(locationMap);
 
         // Set participants (with checks)
-        setParticipantsList(fetchedParticipants || []);
-        const participantsMap = (fetchedParticipants || []).reduce(
+        // Extract participants array from the response
+        const fetchedParticipants = participantsResponse.participants || [];
+        setParticipantsList(fetchedParticipants);
+
+        const participantsMap = fetchedParticipants.reduce(
           (acc, participant) => {
             if (participant?._id) {
               acc[participant._id] = participant;

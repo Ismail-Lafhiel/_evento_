@@ -175,6 +175,10 @@ export class UsersController {
   @UseGuards(OrganizerGuard)
   @Get('participants')
   async getAllParticipants() {
-    return await this.usersService.findAllParticipants();
+    const result = await this.usersService.findAllParticipants();
+    return {
+      success: true,
+      data: result,
+    };
   }
 }
