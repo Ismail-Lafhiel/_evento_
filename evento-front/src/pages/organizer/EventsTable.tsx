@@ -15,11 +15,17 @@ import { Link } from "react-router-dom";
 
 const EventsTable = () => {
   // events states
+  //   map events
   const [events, setEvents] = useState<Event[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  //   create
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  //   edit
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  //   delete
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   //   location states
   const [locationsList, setLocationsList] = useState<Location[]>([]);
   const [locationsMap, setLocationsMap] = useState<{ [key: string]: Location }>(
@@ -202,6 +208,25 @@ const EventsTable = () => {
       toast.error(error.message || "Failed to update event");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+  //delete event
+  const handleDeleteEvent = async () => {
+    if (!eventToDelete) return;
+
+    try {
+      setIsDeleting(true);
+      await eventService.deleteEvent(eventToDelete);
+
+      toast.success("Event deleted successfully!");
+      setIsDeleteModalOpen(false);
+      setEventToDelete(null);
+      refreshData();
+    } catch (error: any) {
+      console.error("Error deleting event:", error);
+      toast.error(error.message || "Failed to delete event");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -449,6 +474,7 @@ const EventsTable = () => {
                                 onClick={() => {
                                   setOpenDropdown(null);
                                   setIsDeleteModalOpen(true);
+                                  setEventToDelete(event._id);
                                 }}
                                 className="block w-full text-left py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                               >
@@ -838,10 +864,38 @@ const EventsTable = () => {
                 No, cancel
               </button>
               <button
-                type="submit"
+                type="button"
+                onClick={handleDeleteEvent}
+                disabled={isDeleting}
                 className="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-900"
               >
-                Yes, I'm sure
+                {isDeleting ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Deleting...
+                  </>
+                ) : (
+                  "Yes, I'm sure"
+                )}
               </button>
             </div>
           </div>
