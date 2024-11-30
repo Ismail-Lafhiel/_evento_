@@ -4,6 +4,7 @@ import { Model, isValidObjectId } from 'mongoose';
 import { Event, eventDocument } from '../schemas/event.schema';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from 'src/dto/update-event.dto';
+import { User } from 'src/schemas/user.schema';
 
 @Injectable()
 export class EventsService {
@@ -17,16 +18,20 @@ export class EventsService {
   }
 
   async findAll(): Promise<{ data: Event[]; count: number }> {
-    const events = await this.eventModel
-      .find()
-      .populate('location')
-      .populate('participants')
-      .exec();
+    try {
+      const events = await this.eventModel
+        .find()
+        .populate('location')
+        .populate('participants')
+        .exec();
 
-    return {
-      data: events,
-      count: events.length,
-    };
+      return {
+        data: events,
+        count: events.length,
+      };
+    } catch (error) {
+      throw new Error('Failed to fetch events');
+    }
   }
 
   async findOne(id: string): Promise<Event> {
@@ -73,5 +78,80 @@ export class EventsService {
     if (!result) {
       throw new NotFoundException(`Event with ID ${id} not found`);
     }
+  }
+
+  // handling participants
+
+  async getEventWithParticipants(eventId: string): Promise<{
+    eventId: string;
+    eventName: string;
+    description: string;
+    sportType: string;
+    date: Date;
+    participants: User[];
+    participantCount: number;
+  }> {
+    this.validateObjectId(eventId);
+
+    const event = await this.eventModel
+      .findById(eventId)
+      .populate('participants')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+
+    return {
+      eventId: event._id.toString(),
+      eventName: event.name,
+      description: event.description,
+      sportType: event.sportType,
+      date: event.date,
+      participants: event.participants,
+      participantCount: event.participants.length,
+    };
+  }
+
+  async addParticipant(eventId: string, userId: string): Promise<Event> {
+    this.validateObjectId(eventId);
+    this.validateObjectId(userId);
+
+    const event = await this.eventModel
+      .findByIdAndUpdate(
+        eventId,
+        { $addToSet: { participants: userId } },
+        { new: true },
+      )
+      .populate('location')
+      .populate('participants')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+
+    return event;
+  }
+
+  async removeParticipant(eventId: string, userId: string): Promise<Event> {
+    this.validateObjectId(eventId);
+    this.validateObjectId(userId);
+
+    const event = await this.eventModel
+      .findByIdAndUpdate(
+        eventId,
+        { $pull: { participants: userId } },
+        { new: true },
+      )
+      .populate('location')
+      .populate('participants')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+
+    return event;
   }
 }

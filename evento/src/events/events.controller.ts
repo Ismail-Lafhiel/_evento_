@@ -8,6 +8,7 @@ import {
   Param,
   UseGuards,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 
@@ -34,13 +35,19 @@ export class EventsController {
 
   @Get()
   async findAll() {
-    const { data, count } = await this.eventsService.findAll();
-    return {
-      statusCode: HttpStatus.OK,
-      message: count > 0 ? 'Events retrieved successfully' : 'No events found',
-      data: data,
-      count: count,
-    };
+    try {
+      const events = await this.eventsService.findAll();
+      return {
+        success: true,
+        data: events.data,
+        count: events.count,
+      };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch events',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get(':id')
@@ -76,6 +83,37 @@ export class EventsController {
     return {
       statusCode: HttpStatus.OK,
       message: 'Event deleted successfully',
+    };
+  }
+
+  @Get(':id/participants')
+  async getEventWithParticipants(@Param('id') id: string) {
+    return this.eventsService.getEventWithParticipants(id);
+  }
+
+  @Post(':id/participants/:userId')
+  async addParticipant(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ) {
+    const event = await this.eventsService.addParticipant(id, userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Participant added successfully',
+      data: event,
+    };
+  }
+
+  @Delete(':id/:userId')
+  async removeParticipant(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ) {
+    const event = await this.eventsService.removeParticipant(id, userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Participant removed successfully',
+      data: event,
     };
   }
 }

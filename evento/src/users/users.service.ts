@@ -65,4 +65,22 @@ export class UsersService {
       throw error;
     }
   }
+
+  async findAllParticipants(): Promise<{
+    participants: User[];
+    count: number;
+  }> {
+    try {
+      const participants = await this.userModel
+        .find({ role: 'participant' })
+        .exec();
+      return {
+        participants,
+        count: participants.length,
+      };
+    } catch (error) {
+      console.error('Error finding participants:', error);
+      throw error;
+    }
+  }
 }

@@ -6,6 +6,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { authService } from "../../services/auth.service";
 import { toast } from "react-toastify";
+import {
+  AtSymbolIcon,
+  CheckCircleIcon,
+  LockClosedIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 
 const registerSchema = z
   .object({
@@ -46,10 +52,21 @@ const Register = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
+
+  const password = watch("password");
+
+  const passwordRequirements = [
+    { label: "At least 8 characters", regex: /.{8,}/ },
+    { label: "One uppercase letter", regex: /[A-Z]/ },
+    { label: "One lowercase letter", regex: /[a-z]/ },
+    { label: "One number", regex: /[0-9]/ },
+    { label: "One special character", regex: /[!@#$%^&*(),.?":{}|<>]/ },
+  ];
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -84,161 +101,223 @@ const Register = () => {
       setIsLoading(false);
     }
   };
-
   return (
-    <section className="bg-gray-100 dark:bg-gray-900 xl:py-24">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Create an account
-            </h1>
-            <form
-              className="space-y-4 md:space-y-6"
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              <div>
-                <label
-                  htmlFor="fullname"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Full name
-                </label>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-screen">
+        {/* Logo */}
+        <div className="mb-8 text-center">
+          <Link to="/" className="flex items-center justify-center mb-4">
+            <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center">
+              <span className="text-2xl font-bold text-white">E</span>
+            </div>
+          </Link>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Create your account
+          </h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
+            Join us and start participating in sports events
+          </p>
+        </div>
+
+        {/* Registration Form */}
+        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            {/* Full Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <UserIcon className="h-5 w-5 text-gray-400" />
+                </div>
                 <FormInput
                   type="text"
                   {...register("fullname")}
                   id="fullname"
-                  placeholder="Enter your full name"
+                  placeholder="John Doe"
+                  className="pl-10"
                 />
-                {errors.fullname && (
-                  <p className="mt-1 ml-1 text-sm text-red-600">
-                    {errors.fullname.message}
-                  </p>
-                )}
               </div>
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Username
-                </label>
+              {errors.fullname && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500 flex items-center">
+                  <span className="mr-1">•</span>
+                  {errors.fullname.message}
+                </p>
+              )}
+            </div>
+
+            {/* Username */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                Username
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <AtSymbolIcon className="h-5 w-5 text-gray-400" />
+                </div>
                 <FormInput
                   type="text"
                   {...register("username")}
                   id="username"
-                  placeholder="Enter your username"
+                  placeholder="johndoe"
+                  className="pl-10"
                 />
-                {errors.username && (
-                  <p className="mt-1 ml-1 text-sm text-red-600">
-                    {errors.username.message}
-                  </p>
-                )}
               </div>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Email
-                </label>
+              {errors.username && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500 flex items-center">
+                  <span className="mr-1">•</span>
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <AtSymbolIcon className="h-5 w-5 text-gray-400" />
+                </div>
                 <FormInput
                   type="email"
                   {...register("email")}
                   id="email"
-                  placeholder="Enter your email"
+                  placeholder="john@example.com"
+                  className="pl-10"
                 />
-                {errors.email && (
-                  <p className="mt-1 ml-1 text-sm text-red-600">
-                    {errors.email.message}
-                  </p>
-                )}
               </div>
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Password
-                </label>
+              {errors.email && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500 flex items-center">
+                  <span className="mr-1">•</span>
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <LockClosedIcon className="h-5 w-5 text-gray-400" />
+                </div>
                 <FormInput
                   type="password"
                   {...register("password")}
                   id="password"
-                  placeholder="Enter your password"
+                  placeholder="••••••••"
+                  className="pl-10"
                 />
-                {errors.password && (
-                  <p className="mt-1 ml-1 text-sm text-red-600">
-                    {errors.password.message}
-                  </p>
-                )}
               </div>
-              <div>
-                <label
-                  htmlFor="confirm_password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Confirm password
-                </label>
+              {errors.password && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500 flex items-center">
+                  <span className="mr-1">•</span>
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <LockClosedIcon className="h-5 w-5 text-gray-400" />
+                </div>
                 <FormInput
                   type="password"
                   {...register("confirm_password")}
                   id="confirm_password"
-                  placeholder="Confirm your password"
+                  placeholder="••••••••"
+                  className="pl-10"
                 />
-                {errors.confirm_password && (
-                  <p className="mt-1 ml-1 text-sm text-red-600">
-                    {errors.confirm_password.message}
-                  </p>
-                )}
               </div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Registering...
+              {errors.confirm_password && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500 flex items-center">
+                  <span className="mr-1">•</span>
+                  {errors.confirm_password.message}
+                </p>
+              )}
+            </div>
+            {/* Password Requirements */}
+            <div className="mt-2 space-y-2">
+              {passwordRequirements.map((req, index) => (
+                <div key={index} className="flex items-center text-sm">
+                  <CheckCircleIcon
+                    className={`h-4 w-4 mr-2 ${
+                      password?.match(req.regex)
+                        ? "text-green-500"
+                        : "text-gray-300"
+                    }`}
+                  />
+                  <span
+                    className={`${
+                      password?.match(req.regex)
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {req.label}
                   </span>
-                ) : (
-                  "Create an account"
-                )}
-              </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account?{" "}
-                <Link
-                  to="/login"
-                  className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                >
-                  Login here
-                </Link>
-              </p>
-            </form>
-          </div>
+                </div>
+              ))}
+            </div>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Creating account...
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </button>
+
+            {/* Login Link */}
+            <p className="text-center text-sm text-gray-600 dark:text-gray-300">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
+              >
+                Sign in
+              </Link>
+            </p>
+          </form>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

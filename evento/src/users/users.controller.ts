@@ -5,10 +5,14 @@ import {
   HttpException,
   HttpStatus,
   ConflictException,
+  Get,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { Organizer } from 'src/decorators/organizer.decorator';
+import { OrganizerGuard } from 'src/guards/organizer.guard';
 
 @Controller('users')
 export class UsersController {
@@ -35,7 +39,7 @@ export class UsersController {
       try {
         let eventoUser = await this.usersService.findByUsernameOrEmail(
           authUser.username,
-          authUser.email
+          authUser.email,
         );
 
         if (!eventoUser) {
@@ -97,7 +101,7 @@ export class UsersController {
       // Check if user already exists in evento database
       const existingUser = await this.usersService.findByUsernameOrEmail(
         registerDto.username,
-        registerDto.email
+        registerDto.email,
       );
 
       if (existingUser) {
@@ -165,5 +169,16 @@ export class UsersController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  @Organizer()
+  @UseGuards(OrganizerGuard)
+  @Get('participants')
+  async getAllParticipants() {
+    const result = await this.usersService.findAllParticipants();
+    return {
+      success: true,
+      data: result,
+    };
   }
 }

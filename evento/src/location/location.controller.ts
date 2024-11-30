@@ -9,6 +9,7 @@ import {
   Param,
   UseGuards,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { LocationService } from './location.service';
 import { CreateLocationDto } from 'src/dto/create-location.dto';
@@ -34,14 +35,19 @@ export class LocationController {
 
   @Get()
   async findAll() {
-    const { data, count } = await this.locationService.findAll();
-    return {
-      statusCode: HttpStatus.OK,
-      message:
-        count > 0 ? 'Locations retrieved successfully' : 'No locations found',
-      data: data,
-      count: count,
-    };
+    try {
+      const locations = await this.locationService.findAll();
+      return {
+        success: true,
+        data: locations.data,
+        count: locations.count,
+      };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to fetch locations',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get(':id')

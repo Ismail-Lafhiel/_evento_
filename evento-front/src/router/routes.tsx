@@ -10,8 +10,10 @@ import GuestLayout from "../Layouts/GuestLayout";
 import Dashboard from "../pages/organizer/OrganizerDashboard";
 import ParticipantDashboard from "../pages/participant/ParticipantDashboard";
 import EventsTable from "../pages/organizer/EventsTable";
-import { GuestGuard } from "../components/guards/GuestGuard";
-import { RoleGuard } from "../components/guards/RoleGuard";
+import { GuestGuard } from "../guards/GuestGuard";
+import { RoleGuard } from "../guards/RoleGuard";
+import ViewEvent from "../pages/organizer/ViewEvent";
+import Contact from "../pages/Contact";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -25,6 +27,10 @@ const publicRoutes: RouteObject[] = [
       {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "contact",
+        element: <Contact />,
       },
       // Guest routes (only for non-authenticated users)
       {
@@ -65,6 +71,10 @@ const organizerRoutes: RouteObject[] = [
         path: "events",
         element: <EventsTable />,
       },
+      {
+        path: "events/:id",
+        element: <ViewEvent />,
+      }
     ],
   },
 ];

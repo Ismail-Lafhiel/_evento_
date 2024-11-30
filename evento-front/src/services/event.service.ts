@@ -9,12 +9,10 @@ interface ApiResponse<T> {
 
 export const eventService = {
   // Get all events
-  getAllEvents: async (): Promise<Event[]> => {
+  getAllEvents: async () => {
     try {
-      const response = await api.get<ApiResponse<Event[]>>(
-        "/events?populate=location"
-      );
-      return response.data.data;
+      const response = await api.get("/events");
+      return response.data;
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || "Failed to fetch events"
@@ -69,6 +67,50 @@ export const eventService = {
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || "Failed to delete event"
+      );
+    }
+  },
+
+  addParticipant: async (eventId: string, userId: string): Promise<Event> => {
+    try {
+      const response = await api.post<ApiResponse<Event>>(
+        `/events/${eventId}/participants/${userId}`
+      );
+      return response.data.data;
+    } catch (error: any) {
+      console.error("Error details:", error.response);
+      throw new Error(
+        error.response?.data?.message || "Failed to add participant"
+      );
+    }
+  },
+
+  getEventWithParticipants: async (id: string): Promise<Event> => {
+    try {
+      const response = await api.get<ApiResponse<Event>>(`/events/${id}`);
+      return response.data.data;
+    } catch (error: any) {
+      console.error("Error details:", error.response);
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to fetch event with participants"
+      );
+    }
+  },
+
+  removeParticipant: async (
+    eventId: string,
+    userId: string
+  ): Promise<Event> => {
+    try {
+      const response = await api.delete<ApiResponse<Event>>(
+        `/events/${eventId}/${userId}`
+      );
+      return response.data.data;
+    } catch (error: any) {
+      console.error("Error details:", error.response);
+      throw new Error(
+        error.response?.data?.message || "Failed to remove participant"
       );
     }
   },
