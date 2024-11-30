@@ -30,6 +30,16 @@ export class Event {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   })
   participants: User[];
+
+  @Prop({
+    required: true,
+    min: 1,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Capacity must be a whole number',
+    },
+  })
+  capacity: number;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

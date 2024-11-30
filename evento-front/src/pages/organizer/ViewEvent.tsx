@@ -343,7 +343,7 @@ const ViewEvent = () => {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">Capacity</span>
                 <span className="text-sm font-medium text-gray-900">
-                  {event.participants.length}/{event.maxParticipants}
+                  {event.participants.length}/{event.capacity}
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
@@ -351,7 +351,7 @@ const ViewEvent = () => {
                   className="bg-primary-500 h-2 rounded-full"
                   style={{
                     width: `${
-                      (event.participants.length / event.maxParticipants) * 100
+                      (event.participants.length / event.capacity) * 100
                     }%`,
                   }}
                 ></div>
