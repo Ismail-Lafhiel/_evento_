@@ -10,7 +10,6 @@ import {
   UsersIcon,
   TicketIcon,
   InformationCircleIcon,
-  TrashIcon,
 } from "@heroicons/react/24/outline";
 import { PrinterIcon } from "@heroicons/react/16/solid";
 
@@ -61,6 +60,19 @@ const ViewEvent = () => {
     }
   };
 
+  const handlePrint = () => {
+    const originalContents = document.body.innerHTML;
+
+    const printContent = document.getElementById("printable-content");
+    if (printContent) {
+      document.body.innerHTML = printContent.innerHTML;
+    }
+
+    window.print();
+
+    document.body.innerHTML = originalContents;
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -98,7 +110,7 @@ const ViewEvent = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div id="printable-content" className="p-6 max-w-7xl mx-auto">
       {/* Header Section */}
       <div className="mb-8 bg-white rounded-lg shadow-sm p-6">
         <div className="flex justify-between items-start">
@@ -116,7 +128,10 @@ const ViewEvent = () => {
               </span>
             </div>
           </div>
-          <button className="group inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-full hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 shadow-sm hover:shadow-md text-sm">
+          <button
+            onClick={handlePrint}
+            className="group inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-full hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 shadow-sm hover:shadow-md text-sm"
+          >
             <PrinterIcon className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:scale-110" />
             <span className="font-medium">Print Event</span>
           </button>

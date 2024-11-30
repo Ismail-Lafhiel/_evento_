@@ -9,9 +9,21 @@ interface ApiResponse<T> {
 
 export const eventService = {
   // Get all events
-  getAllEvents: async () => {
+  // src/services/event.service.ts
+
+  getAllEvents: async (
+    page: number = 1,
+    limit: number = 10,
+    search: string = ""
+  ) => {
     try {
-      const response = await api.get("/events");
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(search && { search }),
+      });
+
+      const response = await api.get(`/events?${params}`);
       return response.data;
     } catch (error: any) {
       throw new Error(

@@ -9,6 +9,9 @@ import {
   UseGuards,
   HttpStatus,
   HttpException,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 
@@ -34,20 +37,13 @@ export class EventsController {
   }
 
   @Get()
-  async findAll() {
-    try {
-      const events = await this.eventsService.findAll();
-      return {
-        success: true,
-        data: events.data,
-        count: events.count,
-      };
-    } catch (error) {
-      throw new HttpException(
-        'Failed to fetch events',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  @Get()
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('search') search?: string,
+  ) {
+    return this.eventsService.findAll(page, limit, search);
   }
 
   @Get(':id')

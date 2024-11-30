@@ -17,17 +17,39 @@ export class EventsService {
     return createdEvent.save();
   }
 
-  async findAll(): Promise<{ data: Event[]; count: number }> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+  ): Promise<{ data: Event[]; count: number; totalPages: number }> {
     try {
+      // Build search query
+      const searchQuery = search
+        ? {
+            $or: [
+              { name: { $regex: search, $options: 'i' } },
+              { sportType: { $regex: search, $options: 'i' } },
+            ],
+          }
+        : {};
+
+      const skip = (page - 1) * limit;
+
+      const totalCount = await this.eventModel.countDocuments(searchQuery);
+
       const events = await this.eventModel
-        .find()
+        .find(searchQuery)
         .populate('location')
         .populate('participants')
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit)
         .exec();
 
       return {
         data: events,
-        count: events.length,
+        count: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
       };
     } catch (error) {
       throw new Error('Failed to fetch events');
