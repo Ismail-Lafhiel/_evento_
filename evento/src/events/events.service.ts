@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 import { Event, eventDocument } from '../schemas/event.schema';
 import { CreateEventDto } from '../dto/create-event.dto';
-import { UpdateEventDto } from 'src/dto/update-event.dto';
+import { UpdateEventDto } from '../dto/update-event.dto';
 import { User } from 'src/schemas/user.schema';
 
 @Injectable()
@@ -17,8 +17,7 @@ export class EventsService {
   ) {}
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
-    const createdEvent = new this.eventModel(createEventDto);
-    return createdEvent.save();
+    return this.eventModel.create(createEventDto);
   }
 
   async findAll(
