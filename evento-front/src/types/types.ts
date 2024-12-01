@@ -23,6 +23,7 @@ export interface Event {
   description: string;
   sportType: string;
   date: Date;
+  capacity: number;
   location: Location | string;
   participants: (User | string)[];
   createdAt?: Date;

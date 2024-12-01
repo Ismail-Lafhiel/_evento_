@@ -8,7 +8,6 @@ import {
   Param,
   UseGuards,
   HttpStatus,
-  HttpException,
   Query,
   DefaultValuePipe,
   ParseIntPipe,
@@ -17,8 +16,8 @@ import { EventsService } from './events.service';
 
 import { OrganizerGuard } from '../guards/organizer.guard';
 import { Organizer } from '../decorators/organizer.decorator';
-import { CreateEventDto } from 'src/dto/create-event.dto';
-import { UpdateEventDto } from 'src/dto/update-event.dto';
+import { CreateEventDto } from '../dto/create-event.dto';
+import { UpdateEventDto } from '../dto/update-event.dto';
 
 @Controller('events')
 export class EventsController {
@@ -87,29 +86,24 @@ export class EventsController {
     return this.eventsService.getEventWithParticipants(id);
   }
 
-  @Post(':id/participants/:userId')
+  @Post(':eventId/participants/:userId')
   async addParticipant(
-    @Param('id') id: string,
+    @Param('eventId') eventId: string,
     @Param('userId') userId: string,
   ) {
-    const event = await this.eventsService.addParticipant(id, userId);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Participant added successfully',
-      data: event,
-    };
+    return this.eventsService.addParticipant(eventId, userId);
   }
 
-  @Delete(':id/:userId')
+  @Delete(':eventId/:userId')
   async removeParticipant(
-    @Param('id') id: string,
+    @Param('eventId') eventId: string,
     @Param('userId') userId: string,
   ) {
-    const event = await this.eventsService.removeParticipant(id, userId);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Participant removed successfully',
-      data: event,
-    };
+    return this.eventsService.removeParticipant(eventId, userId);
+  }
+
+  @Get(':eventId/available-spots')
+  async getAvailableSpots(@Param('eventId') eventId: string) {
+    return this.eventsService.getAvailableSpots(eventId);
   }
 }

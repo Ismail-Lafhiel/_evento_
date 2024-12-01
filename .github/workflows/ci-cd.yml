@@ -1,0 +1,75 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BACKEND_DOCKER_IMAGE: your-dockerhub-username/evento-backend
+  FRONTEND_DOCKER_IMAGE: your-dockerhub-username/evento-frontend
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./evento
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: './evento/package-lock.json'
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Run Tests
+      run: npm test
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build and push Backend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./evento
+        push: true
+        tags: |
+          ${{ env.BACKEND_DOCKER_IMAGE }}:latest
+          ${{ env.BACKEND_DOCKER_IMAGE }}:${{ github.sha }}
+        cache-from: type=registry,ref=${{ env.BACKEND_DOCKER_IMAGE }}:buildcache
+        cache-to: type=registry,ref=${{ env.BACKEND_DOCKER_IMAGE }}:buildcache,mode=max
+
+    - name: Build and push Frontend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./evento-front
+        push: true
+        tags: |
+          ${{ env.FRONTEND_DOCKER_IMAGE }}:latest
+          ${{ env.FRONTEND_DOCKER_IMAGE }}:${{ github.sha }}
+        cache-from: type=registry,ref=${{ env.FRONTEND_DOCKER_IMAGE }}:buildcache
+        cache-to: type=registry,ref=${{ env.FRONTEND_DOCKER_IMAGE }}:buildcache,mode=max

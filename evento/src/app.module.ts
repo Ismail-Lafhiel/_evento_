@@ -10,6 +10,7 @@ import { AuthMiddleware } from './middleware/auth.middleware';
 import { UsersModule } from './users/users.module';
 import { LocationModule } from './location/location.module';
 import { EventsModule } from './events/events.module';
+import { TicketsModule } from './tickets/tickets.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EventsModule } from './events/events.module';
     UsersModule,
     LocationModule,
     EventsModule,
+    TicketsModule,
   ],
   controllers: [],
 })

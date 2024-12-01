@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsDate, IsMongoId } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDate,
+  IsMongoId,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateEventDto {
@@ -21,4 +27,8 @@ export class CreateEventDto {
   @IsMongoId()
   @IsNotEmpty()
   location: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  capacity: number;
 }

@@ -160,6 +160,7 @@ const EventsTable = () => {
   }, [openDropdown]);
 
   const refreshData = () => {
+    setCurrentPage(1);
     setRefreshTrigger((prev) => prev + 1);
   };
 
@@ -209,6 +210,7 @@ const EventsTable = () => {
         sportType: data.sportType,
         date: new Date(data.date),
         location: data.location,
+        capacity: data.capacity,
         participants: [],
       };
 
@@ -756,7 +758,27 @@ const EventsTable = () => {
                 locations={locationsList}
               />
             </div>
-            <div className="sm:col-span-2">
+            <div>
+              <label
+                htmlFor="capacity"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Event capacity
+                <span className="ml-1 text-red-500">*</span>
+              </label>
+              <FormInput
+                type="number"
+                id="capacity"
+                {...register("capacity")}
+                placeholder="Enter event capacity"
+              />
+              {errors.capacity && (
+                <p className="mt-1 ml-1 text-sm text-red-600">
+                  {errors.capacity.message}
+                </p>
+              )}
+            </div>
+            <div>
               <label
                 htmlFor="description"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"

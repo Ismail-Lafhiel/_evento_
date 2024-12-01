@@ -30,6 +30,12 @@ export class Event {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   })
   participants: User[];
+
+  @Prop({
+    required: true,
+    min: [1, 'Capacity is required'],
+  })
+  capacity: number;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
