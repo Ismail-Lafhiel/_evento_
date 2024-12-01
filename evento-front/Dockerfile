@@ -1,18 +1,20 @@
-FROM node:20-alpine as builder
+# Build stage
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm install
 
 COPY . .
 
-RUN npm run build
+RUN echo "Starting build process..."
+RUN npm run build || (echo "Build failed" && npm run build --verbose && exit 1)
 
+# Production stage
 FROM nginx:alpine
 
-# Copy built assets from builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
