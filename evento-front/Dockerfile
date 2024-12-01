@@ -1,10 +1,10 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine as builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
@@ -12,7 +12,8 @@ RUN npm run build
 
 FROM nginx:alpine
 
-COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+# Copy built assets from builder
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
