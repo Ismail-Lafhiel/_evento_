@@ -87,29 +87,24 @@ export class EventsController {
     return this.eventsService.getEventWithParticipants(id);
   }
 
-  @Post(':id/participants/:userId')
+  @Post(':eventId/participants/:userId')
   async addParticipant(
-    @Param('id') id: string,
+    @Param('eventId') eventId: string,
     @Param('userId') userId: string,
   ) {
-    const event = await this.eventsService.addParticipant(id, userId);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Participant added successfully',
-      data: event,
-    };
+    return this.eventsService.addParticipant(eventId, userId);
   }
 
-  @Delete(':id/:userId')
+  @Delete(':eventId/:userId')
   async removeParticipant(
-    @Param('id') id: string,
+    @Param('eventId') eventId: string,
     @Param('userId') userId: string,
   ) {
-    const event = await this.eventsService.removeParticipant(id, userId);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Participant removed successfully',
-      data: event,
-    };
+    return this.eventsService.removeParticipant(eventId, userId);
+  }
+
+  @Get(':eventId/available-spots')
+  async getAvailableSpots(@Param('eventId') eventId: string) {
+    return this.eventsService.getAvailableSpots(eventId);
   }
 }

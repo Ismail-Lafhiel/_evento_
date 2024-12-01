@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 import { Event, eventDocument } from '../schemas/event.schema';
@@ -136,44 +140,64 @@ export class EventsService {
   }
 
   async addParticipant(eventId: string, userId: string): Promise<Event> {
-    this.validateObjectId(eventId);
-    this.validateObjectId(userId);
+    const event = await this.eventModel.findById(eventId);
 
-    const event = await this.eventModel
-      .findByIdAndUpdate(
-        eventId,
-        { $addToSet: { participants: userId } },
-        { new: true },
-      )
-      .populate('location')
-      .populate('participants')
-      .exec();
-
-    if (!event) {
-      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    // Check if event is full
+    if (event.participants.length >= event.capacity) {
+      throw new BadRequestException('Event has reached maximum capacity');
     }
 
-    return event;
+    // Check if user is already participating
+    if (
+      event.participants.some(
+        (participant) => participant._id.toString() === userId,
+      )
+    ) {
+      throw new BadRequestException(
+        'User is already participating in this event',
+      );
+    }
+
+    event.participants.push(userId as any);
+    return event.save();
   }
 
   async removeParticipant(eventId: string, userId: string): Promise<Event> {
-    this.validateObjectId(eventId);
-    this.validateObjectId(userId);
-
-    const event = await this.eventModel
-      .findByIdAndUpdate(
-        eventId,
-        { $pull: { participants: userId } },
-        { new: true },
-      )
-      .populate('location')
-      .populate('participants')
-      .exec();
+    const event = await this.eventModel.findById(eventId);
 
     if (!event) {
-      throw new NotFoundException(`Event with ID ${eventId} not found`);
+      throw new NotFoundException('Event not found');
     }
 
-    return event;
+    if (
+      !event.participants.some(
+        (participant) => participant._id.toString() === userId,
+      )
+    ) {
+      throw new BadRequestException('User is not participating in this event');
+    }
+
+    event.participants = event.participants.filter(
+      (participant) => participant._id.toString() !== userId,
+    );
+
+    return event.save();
+  }
+
+  async getAvailableSpots(eventId: string): Promise<number> {
+    const event = await this.findOne(eventId);
+    return event.capacity - event.participants.length;
+  }
+
+  async isEventFull(eventId: string): Promise<boolean> {
+    const event = await this.findOne(eventId);
+    return event.participants.length >= event.capacity;
+  }
+
+  async isUserParticipating(eventId: string, userId: string): Promise<boolean> {
+    const event = await this.findOne(eventId);
+    return event.participants.some(
+      (participant) => participant._id.toString() === userId,
+    );
   }
 }

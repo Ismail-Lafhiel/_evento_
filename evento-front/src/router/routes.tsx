@@ -14,6 +14,7 @@ import { GuestGuard } from "../guards/GuestGuard";
 import { RoleGuard } from "../guards/RoleGuard";
 import ViewEvent from "../pages/organizer/ViewEvent";
 import Contact from "../pages/Contact";
+import TicketsTable from "../pages/organizer/TicketsTable";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -74,7 +75,11 @@ const organizerRoutes: RouteObject[] = [
       {
         path: "events/:id",
         element: <ViewEvent />,
-      }
+      },
+      {
+        path: "tickets",
+        element: <TicketsTable />,
+      },
     ],
   },
 ];

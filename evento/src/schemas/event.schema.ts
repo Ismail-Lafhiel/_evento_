@@ -33,11 +33,7 @@ export class Event {
 
   @Prop({
     required: true,
-    min: 1,
-    validate: {
-      validator: Number.isInteger,
-      message: 'Capacity must be a whole number',
-    },
+    min: [1, 'Capacity is required'],
   })
   capacity: number;
 }
