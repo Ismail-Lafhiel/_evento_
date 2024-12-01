@@ -3,8 +3,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 import { Location, LocationDocument } from '../schemas/location.schema';
-import { CreateLocationDto } from 'src/dto/create-location.dto';
-import { UpdateLocationDto } from 'src/dto/update-location.dto';
+import { CreateLocationDto } from '../dto/create-location.dto';
+import { UpdateLocationDto } from '../dto/update-location.dto';
 
 @Injectable()
 export class LocationService {
@@ -13,8 +13,7 @@ export class LocationService {
   ) {}
 
   async create(createLocationDto: CreateLocationDto): Promise<Location> {
-    const createdLocation = new this.locationModel(createLocationDto);
-    return createdLocation.save();
+    return this.locationModel.create(createLocationDto);
   }
 
   async findAll(): Promise<{ data: Location[]; count: number }> {

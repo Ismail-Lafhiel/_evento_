@@ -12,10 +12,10 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { LocationService } from './location.service';
-import { CreateLocationDto } from 'src/dto/create-location.dto';
-import { UpdateLocationDto } from 'src/dto/update-location.dto';
+import { CreateLocationDto } from '../dto/create-location.dto';
+import { UpdateLocationDto } from '../dto/update-location.dto';
 import { OrganizerGuard } from '../guards/organizer.guard';
-import { Organizer } from 'src/decorators/organizer.decorator';
+import { Organizer } from '../decorators/organizer.decorator';
 
 @Controller('locations')
 export class LocationController {
