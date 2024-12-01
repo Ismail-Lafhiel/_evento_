@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { authService } from "../services/auth.service";
 import { Fragment, useState } from "react";

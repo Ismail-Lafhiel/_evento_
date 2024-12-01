@@ -9,7 +9,6 @@ import {
   ChevronDoubleRightIcon,
   UserGroupIcon,
   StarIcon,
-  BellIcon,
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
   UserCircleIcon,

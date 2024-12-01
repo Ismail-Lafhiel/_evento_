@@ -9,7 +9,13 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
-    sourcemap: false,
-    minify: true,
+    sourcemap: true,
+    minify: "esbuild",
+    chunkSizeWarningLimit: 1600,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
 });

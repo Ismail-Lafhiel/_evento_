@@ -1,34 +1,43 @@
 # Build stage
 FROM node:20-alpine AS builder
 
-# Install additional debugging tools
-RUN apk add --no-cache python3 make g++
+# Install additional tools for debugging and building
+RUN apk add --no-cache python3 make g++ git
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first
 COPY package*.json ./
 
-# Install dependencies with verbose logging
-RUN npm install --verbose
+# Clear npm cache and install dependencies
+RUN npm cache clean --force
+RUN npm install
 
-# Copy source code
+# Copy the rest of the application
 COPY . .
 
-# Debug: List files and check Node version
-RUN ls -la
+# Debug: Show versions and environment
 RUN node -v
 RUN npm -v
+RUN echo "Listing directory contents:"
+RUN ls -la
 
-# Debug: Show environment
-RUN env
+# Set environment variables
+ENV NODE_ENV=production
+ENV PATH /app/node_modules/.bin:$PATH
 
-# Add build debugging
-RUN echo "Content of package.json:"
-RUN cat package.json
-
-# Try to run build with more debugging info
-RUN NODE_ENV=production npm run build --verbose || (echo "Build failed" && npm run build --verbose && exit 1)
+# Try building with different approaches
+RUN echo "Starting build process..." && \
+    if [ -f "vite.config.js" ]; then \
+        echo "Found vite.config.js" && \
+        cat vite.config.js; \
+    fi && \
+    echo "Package.json contents:" && \
+    cat package.json && \
+    echo "Starting build..." && \
+    npm run build || \
+    (echo "Build failed, retrying with more details..." && \
+     npm run build --verbose)
 
 # Production stage
 FROM nginx:alpine

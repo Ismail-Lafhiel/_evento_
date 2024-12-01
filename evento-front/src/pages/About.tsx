@@ -1,9 +1,6 @@
 import {
   UserGroupIcon,
   TrophyIcon,
-  CalendarIcon,
-  MapPinIcon,
-  ChatBubbleBottomCenterTextIcon,
   HeartIcon,
 } from "@heroicons/react/24/outline";
 
