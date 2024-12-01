@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./evento
+      dockerfile: Dockerfile
+    container_name: evento-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/evento
+    networks:
+      - evento-network
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: ./evento-front
+      dockerfile: Dockerfile
+    container_name: evento-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - evento-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: evento-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - evento-network
+
+networks:
+  evento-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
