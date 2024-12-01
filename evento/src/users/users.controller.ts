@@ -11,8 +11,8 @@ import {
 import { UsersService } from './users.service';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { Organizer } from 'src/decorators/organizer.decorator';
-import { OrganizerGuard } from 'src/guards/organizer.guard';
+import { Organizer } from '../decorators/organizer.decorator';
+import { OrganizerGuard } from '../guards/organizer.guard';
 
 @Controller('users')
 export class UsersController {
@@ -52,7 +52,7 @@ export class UsersController {
             registeredEvents: [],
           });
         } else {
-          // Update existing user data if needed
+          // Update existing user data
           eventoUser = await this.usersService.update(eventoUser._id, {
             fullname: authUser.fullname,
           });
@@ -144,7 +144,6 @@ export class UsersController {
         };
       } catch (dbError) {
         if (dbError.code === 11000) {
-          // Determine which field caused the duplicate key error
           const field = Object.keys(dbError.keyPattern)[0];
           throw new ConflictException(`${field} already exists`);
         }

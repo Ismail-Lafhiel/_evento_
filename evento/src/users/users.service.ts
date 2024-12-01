@@ -23,30 +23,29 @@ export class UsersService {
         })
         .exec();
     } catch (error) {
-      console.error('Error finding user:', error);
+      // console.error('Error finding user:', error);
       return null;
     }
   }
 
   async create(userData: Partial<User>): Promise<User> {
     try {
-      // Check if user exists first
+      // if user exists
       const existingUser = await this.findByUsernameOrEmail(
         userData.username,
         userData.email,
       );
 
       if (existingUser) {
-        // If user exists, return the existing user
+        //return the existing user
         return existingUser;
       }
 
-      // If user doesn't exist, create new user
-      const newUser = new this.userModel(userData);
-      return await newUser.save();
+      // create new user if doesn't exist
+      return await this.userModel.create(userData);
     } catch (error) {
       if (error.code === 11000) {
-        // Handle duplicate key error by returning existing user
+        // Handling the duplicate key error
         const existingUser = await this.findByUsernameOrEmail(
           userData.username,
           userData.email,
@@ -65,7 +64,7 @@ export class UsersService {
         .findByIdAndUpdate(id, updateData, { new: true })
         .exec();
     } catch (error) {
-      console.error('Error updating user:', error);
+      // console.error('Error updating user:', error);
       throw error;
     }
   }
@@ -83,7 +82,7 @@ export class UsersService {
         count: participants.length,
       };
     } catch (error) {
-      console.error('Error finding participants:', error);
+      // console.error('Error finding participants:', error);
       throw error;
     }
   }

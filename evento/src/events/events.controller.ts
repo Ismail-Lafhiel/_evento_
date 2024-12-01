@@ -8,7 +8,6 @@ import {
   Param,
   UseGuards,
   HttpStatus,
-  HttpException,
   Query,
   DefaultValuePipe,
   ParseIntPipe,

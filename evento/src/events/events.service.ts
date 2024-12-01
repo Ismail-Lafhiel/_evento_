@@ -26,7 +26,7 @@ export class EventsService {
     search?: string,
   ): Promise<{ data: Event[]; count: number; totalPages: number }> {
     try {
-      // Build search query
+      //search query
       const searchQuery = search
         ? {
             $or: [
@@ -141,12 +141,12 @@ export class EventsService {
   async addParticipant(eventId: string, userId: string): Promise<Event> {
     const event = await this.eventModel.findById(eventId);
 
-    // Check if event is full
+    // if event is full
     if (event.participants.length >= event.capacity) {
       throw new BadRequestException('Event has reached maximum capacity');
     }
 
-    // Check if user is already participating
+    //if user is already participating
     if (
       event.participants.some(
         (participant) => participant._id.toString() === userId,
