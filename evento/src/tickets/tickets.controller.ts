@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Ticket } from 'src/schemas/ticket.schema';
-import CreateTicketDto from 'src/dto/create-tcket-dto';
-import { UpdateTicketDto } from 'src/dto/update-ticket-dto';
-import { Organizer } from 'src/decorators/organizer.decorator';
+import { Ticket } from '../schemas/ticket.schema';
+import CreateTicketDto from '../dto/create-tcket-dto';
+import { UpdateTicketDto } from '../dto/update-ticket-dto';
+import { Organizer } from '../decorators/organizer.decorator';
 
 @ApiTags('Tickets')
 @Controller('tickets')

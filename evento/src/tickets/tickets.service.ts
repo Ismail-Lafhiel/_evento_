@@ -1,11 +1,9 @@
-// src/ticket/ticket.service.ts
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
-import CreateTicketDto from 'src/dto/create-tcket-dto';
-import { UpdateTicketDto } from 'src/dto/update-ticket-dto';
-import { Ticket, TicketDocument } from 'src/schemas/ticket.schema';
+import CreateTicketDto from '../dto/create-tcket-dto';
+import { UpdateTicketDto } from '../dto/update-ticket-dto';
+import { Ticket, TicketDocument } from '../schemas/ticket.schema';
 
 @Injectable()
 export class TicketsService {
@@ -14,8 +12,7 @@ export class TicketsService {
   ) {}
 
   async create(createTicketDto: CreateTicketDto): Promise<Ticket> {
-    const createdTicket = new this.ticketModel(createTicketDto);
-    return createdTicket.save();
+    return this.ticketModel.create(createTicketDto);
   }
 
   async findAll(): Promise<{ data: Ticket[]; count: number }> {
