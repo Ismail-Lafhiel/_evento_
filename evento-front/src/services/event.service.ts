@@ -58,7 +58,7 @@ export const eventService = {
 
   updateEvent: async (
     id: string,
-    eventData: Partial<Event>
+    eventData: Omit<Event, "_id" | "createdAt" | "updatedAt">
   ): Promise<Event> => {
     try {
       const response = await api.put<ApiResponse<Event>>(

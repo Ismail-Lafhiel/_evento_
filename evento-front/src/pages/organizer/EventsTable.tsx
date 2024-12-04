@@ -240,18 +240,27 @@ const EventsTable = () => {
     }
   };
   // update event
-  const updateEvent = async (data: EventFormData) => {
+  const updateEvent = async (data: EventFormData): Promise<Event | void> => {
     try {
       setIsSubmitting(true);
 
-      if (!selectedEvent?._id) return;
+      if (!selectedEvent?._id) {
+        toast.error("No event selected for update");
+        return;
+      }
+
+      const date = new Date(data.date);
+      if (isNaN(date.getTime())) {
+        toast.error("Invalid date format");
+        return;
+      }
 
       const eventData = {
-        name: data.name,
-        description: data.description,
+        name: data.name.trim(),
+        description: data.description.trim(),
         sportType: data.sportType,
-        date: new Date(data.date),
-        location: data.location,
+        date: date,
+        location: data.location.trim(),
         participants: selectedEvent.participants || [],
       };
 
@@ -272,7 +281,7 @@ const EventsTable = () => {
 
       setIsEditModalOpen(false);
       setSelectedEvent(null);
-      refreshData();
+      await refreshData();
 
       return updatedEvent;
     } catch (error: any) {
@@ -282,6 +291,7 @@ const EventsTable = () => {
       setIsSubmitting(false);
     }
   };
+
   //delete event
   const handleDeleteEvent = async () => {
     if (!eventToDelete) return;

@@ -9,7 +9,6 @@ import { NextFunction } from 'express';
 import { RequestWithUser } from 'src/interfaces/request.interface';
 import { UsersService } from 'src/users/users.service';
 
-// src/middleware/auth.middleware.ts
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(
@@ -58,7 +57,6 @@ export class AuthMiddleware implements NestMiddleware {
               registeredEvents: [],
             });
           } catch (error) {
-            // Check one more time in case of race condition
             eventoUser = await this.usersService.findByUsernameOrEmail(
               userData.username,
               userData.email,

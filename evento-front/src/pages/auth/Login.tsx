@@ -53,61 +53,80 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex overflow-hidden">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-500 to-primary-700 p-12 items-center justify-center">
-        <div className="max-w-lg">
-          <Link to="/" className="flex items-center mb-8">
-            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-3xl font-bold text-primary-600">E</span>
-            </div>
-          </Link>
+      <div className="hidden lg:flex lg:w-1/2 relative p-12 lg:pt-48 justify-center">
+        {/* Background image with overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('public/img/hero_cover.jpg')",
+          }}
+        >
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/50 to-black/30" />
+        </div>
+
+        {/* Content */}
+        <div className="relative max-w-lg">
           <h1 className="text-4xl font-bold text-white mb-6">
             Welcome to Evento
           </h1>
-          <p className="text-lg text-primary-100 mb-8">
+          <p className="text-xl text-gray-200 mb-8 leading-relaxed">
             Join the ultimate sports event management platform. Organize,
             participate, and celebrate sports together.
           </p>
-          <div className="grid grid-cols-2 gap-4 text-primary-100">
-            <div className="flex items-center">
+
+          <div className="grid grid-cols-2 gap-6 text-gray-200">
+            <div className="flex items-center p-4 bg-white/5 backdrop-blur-lg rounded-lg hover:bg-white/10 transition-colors">
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-6 h-6 text-white"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
                 <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
               </svg>
-              <span>Join Events</span>
+              <span className="ml-4 text-lg text-white group-hover:translate-x-1 transition-transform">
+                Join Events
+              </span>
             </div>
-            <div className="flex items-center">
+
+            <div className="flex items-center p-4 bg-white/5 backdrop-blur-lg rounded-lg hover:bg-white/10 transition-colors">
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-6 h-6 text-white"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
                 <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z" />
               </svg>
-              <span>Create Events</span>
+              <span className="ml-4 text-lg text-white group-hover:translate-x-1 transition-transform">
+                Create Events
+              </span>
             </div>
-            <div className="flex items-center">
+
+            <div className="flex items-center p-4 bg-white/5 backdrop-blur-lg rounded-lg hover:bg-white/10 transition-colors">
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-6 h-6 text-white"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
                 <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
               </svg>
-              <span>Connect Players</span>
+              <span className="ml-4 text-lg text-white group-hover:translate-x-1 transition-transform">
+                Connect Players
+              </span>
             </div>
-            <div className="flex items-center">
+
+            <div className="flex items-center p-4 bg-white/5 backdrop-blur-lg rounded-lg hover:bg-white/10 transition-colors">
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-6 h-6 text-white"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
                 <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
                 <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
               </svg>
-              <span>Track Progress</span>
+              <span className="ml-4 text-lg text-white group-hover:translate-x-1 transition-transform">
+                Track Progress
+              </span>
             </div>
           </div>
         </div>

@@ -104,24 +104,31 @@ const Register = () => {
   return (
     <div className="flex bg-white dark:bg-gray-900">
       {/* Left Side - Logo and Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-500 to-primary-700 p-12 items-center justify-center">
-        <div className="max-w-lg">
-          <Link to="/" className="flex items-center mb-8">
-            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-3xl font-bold text-primary-600">E</span>
-            </div>
-          </Link>
+      <div className="hidden lg:flex lg:w-1/2 relative p-12 lg:pt-[11.5rem] justify-center">
+        {/* Background image with overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('public/img/hero_cover.jpg')",
+          }}
+        >
+          {/* Dark gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/50 to-black/30" />
+        </div>
+
+        {/* Content */}
+        <div className="relative max-w-lg">
           <h1 className="text-4xl font-bold text-white mb-6">
             Join Evento Today
           </h1>
-          <p className="text-lg text-primary-100 mb-8">
+          <p className="text-lg text-gray-200 mb-8">
             Create an account and start your journey in the world of sports
             events. Participate, compete, and connect with other athletes.
           </p>
-          <div className="grid grid-cols-2 gap-4 text-primary-100">
-            <div className="flex items-center">
+          <div className="grid grid-cols-2 gap-6 text-gray-200">
+            <div className="flex items-center p-4 bg-white/5 backdrop-blur-lg rounded-lg hover:bg-white/10 transition-colors">
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-6 h-6 mr-3"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -129,9 +136,9 @@ const Register = () => {
               </svg>
               <span>Create Profile</span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center p-4 bg-white/5 backdrop-blur-lg rounded-lg hover:bg-white/10 transition-colors">
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-6 h-6 mr-3"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -139,9 +146,9 @@ const Register = () => {
               </svg>
               <span>Join Events</span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center p-4 bg-white/5 backdrop-blur-lg rounded-lg hover:bg-white/10 transition-colors">
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-6 h-6 mr-3"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -149,9 +156,9 @@ const Register = () => {
               </svg>
               <span>Meet Athletes</span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center p-4 bg-white/5 backdrop-blur-lg rounded-lg hover:bg-white/10 transition-colors">
               <svg
-                className="w-6 h-6 mr-2"
+                className="w-6 h-6 mr-3"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -164,7 +171,7 @@ const Register = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-12">
         <div className="w-full max-w-md">
           <div className="lg:hidden text-center mb-6">
             <Link to="/" className="inline-block mb-2">
